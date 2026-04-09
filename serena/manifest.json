@@ -1,0 +1,26 @@
+{
+  "name": "Serena — Tu espacio seguro",
+  "short_name": "Serena",
+  "description": "Tu asistente de apoyo emocional",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f0e17",
+  "theme_color": "#0f0e17",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230f0e17'/><circle cx='96' cy='96' r='70' fill='url(%23g)'/><defs><radialGradient id='g' cx='40%25' cy='35%25'><stop offset='0%25' stop-color='%239b7fd4'/><stop offset='100%25' stop-color='%23c8a97e'/></radialGradient></defs><text x='96' y='116' text-anchor='middle' font-size='60'>🌙</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230f0e17'/><circle cx='256' cy='256' r='190' fill='url(%23g)'/><defs><radialGradient id='g' cx='40%25' cy='35%25'><stop offset='0%25' stop-color='%239b7fd4'/><stop offset='100%25' stop-color='%23c8a97e'/></radialGradient></defs><text x='256' y='310' text-anchor='middle' font-size='180'>🌙</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "lifestyle"],
+  "lang": "es"
+}

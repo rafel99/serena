@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0e17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Serena">
+<link rel="manifest" href="./manifest.json">
+<title>Serena — Tu espacio seguro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0e17;--surface:#1a1828;--surface2:#221f35;--text:#e8e4f0;--text-muted:#7e7a94;--user-bubble:#2d2845;--bot-bubble:#1e1c2e;--border:rgba(200,169,126,0.15);--orb-a:#9b7fd4;--orb-b:#c8a97e;--orb-glow:rgba(155,127,212,0.35)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 80% 20%,var(--orb-glow) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 10% 80%,rgba(200,169,126,0.05) 0%,transparent 60%);transition:background 1.5s}
+#app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+
+/* ── ONBOARDING OVERLAY ── */
+#onboarding{display:none;position:fixed;inset:0;z-index:500;background:var(–bg);flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+#onboarding.show{display:flex}
+.ob-orb{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#9b7fd4,#c8a97e 80%);box-shadow:0 0 40px rgba(155,127,212,0.3);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:24px;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.ob-title{font-family:‘Playfair Display’,serif;font-size:26px;margin-bottom:8px}
+.ob-sub{font-size:13.5px;color:var(–text-muted);line-height:1.7;margin-bottom:28px;max-width:290px}
+.ob-input{width:100%;max-width:320px;background:var(–surface2);border:1px solid var(–border);border-radius:16px;padding:14px 18px;font-family:‘DM Sans’,sans-serif;font-size:16px;color:var(–text);outline:none;text-align:center;margin-bottom:12px}
+.ob-input::placeholder{color:var(–text-muted)}
+.ob-input:focus{border-color:rgba(155,127,212,0.5)}
+.ob-avatars{display:flex;gap:10px;margin-bottom:24px;justify-content:center}
+.ob-avatar{width:48px;height:48px;border-radius:50%;background:var(–surface2);border:2px solid transparent;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.ob-avatar.selected{border-color:var(–orb-a);background:rgba(155,127,212,0.15);transform:scale(1.12)}
+.ob-btn{width:100%;max-width:320px;padding:14px;border-radius:16px;background:linear-gradient(135deg,#9b7fd4,#c8a97e);border:none;color:white;font-family:‘DM Sans’,sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity 0.2s;box-shadow:0 4px 20px rgba(155,127,212,0.3)}
+.ob-btn:hover{opacity:0.9}
+.ob-label{font-size:12px;color:var(–text-muted);margin-bottom:10px}
+
+/* ── PROFILE HEADER ── */
+#profile-bar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(–border);background:rgba(15,14,23,0.9);backdrop-filter:blur(14px)}
+.profile-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(–orb-a),var(–orb-b));font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+.profile-name{font-size:13px;font-weight:500;flex:1}
+.profile-streak{font-size:11px;color:var(–text-muted);display:flex;align-items:center;gap:4px}
+
+/* ── INSTALL BANNER ── */
+#install-banner{display:none;flex-shrink:0;background:linear-gradient(135deg,rgba(155,127,212,0.12),rgba(200,169,126,0.08));border-bottom:1px solid var(–border);padding:9px 13px;align-items:center;gap:9px}
+#install-banner.show{display:flex}
+.install-icon{font-size:20px;flex-shrink:0}.install-text{flex:1}.install-text strong{font-size:12.5px;display:block}.install-text span{font-size:10.5px;color:var(–text-muted)}
+.install-btn{background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border:none;color:white;font-family:‘DM Sans’,sans-serif;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:20px;cursor:pointer;flex-shrink:0}
+.install-dismiss{background:none;border:none;color:var(–text-muted);font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
+
+/* ── OFFLINE ── */
+#offline-pill{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c1121f;color:white;font-size:11px;padding:5px 14px;border-radius:20px;z-index:300;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+#offline-pill.show{display:block}
+
+/* TABS */
+#tabs{display:flex;flex-shrink:0;border-bottom:1px solid var(–border);background:rgba(15,14,23,0.9);backdrop-filter:blur(14px)}
+.tab-btn{flex:1;padding:11px 0;background:none;border:none;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:500;color:var(–text-muted);border-bottom:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:4px}
+.tab-btn.active{color:var(–orb-a);border-bottom-color:var(–orb-a)}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden}.screen.active{display:flex}
+
+/* ── ORB ── */
+#orb-header{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 20px 10px;border-bottom:1px solid var(–border);background:rgba(15,14,23,0.85);backdrop-filter:blur(16px)}
+#orb-wrap{position:relative;width:72px;height:72px;margin-bottom:7px}
+#orb-ring{position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(var(–orb-a),var(–orb-b),var(–orb-a));filter:blur(8px);opacity:0.45;animation:spin 6s linear infinite;transition:background 1.2s}
+@keyframes spin{to{transform:rotate(360deg)}}
+#orb{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 38% 35%,var(–orb-a),var(–orb-b) 80%);box-shadow:0 0 22px var(–orb-glow),inset 0 0 12px rgba(255,255,255,0.08);transition:background 1.2s,box-shadow 1.2s;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:breathe 4s ease-in-out infinite}
+#orb::after{content:’’;position:absolute;top:10%;left:18%;width:30%;height:20%;border-radius:50%;background:rgba(255,255,255,0.18);filter:blur(3px);transform:rotate(-30deg)}
+#orb-face{width:42px;height:42px;position:relative;z-index:2}
+.orb-ripple{animation:ripple 0.6s ease-out !important}
+@keyframes ripple{0%{transform:scale(1)}30%{transform:scale(1.13)}60%{transform:scale(0.97)}100%{transform:scale(1)}}
+#emotion-label{font-size:9.5px;letter-spacing:0.13em;text-transform:uppercase;color:var(–text-muted);transition:all 0.8s;margin-bottom:2px}
+.orb-name{font-family:‘Playfair Display’,serif;font-size:16px;font-weight:400}
+.status{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(–text-muted);margin-top:2px}
+.status-dot{width:5px;height:5px;border-radius:50%;background:#6fcf97;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* MESSAGES */
+#messages{flex:1;overflow-y:auto;padding:13px 12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+#messages::-webkit-scrollbar{width:0}
+.msg{display:flex;flex-direction:column;max-width:88%;animation:fadeUp 0.3s ease forwards;opacity:0;transform:translateY(8px)}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;align-items:flex-end}.msg.bot{align-self:flex-start;align-items:flex-start}
+.bubble{padding:10px 13px;border-radius:17px;font-size:13.5px;line-height:1.65}
+.msg.user .bubble{background:linear-gradient(135deg,#3d3660,var(–user-bubble));border-bottom-right-radius:4px;border:1px solid rgba(155,127,212,0.2)}
+.msg.bot .bubble{background:var(–bot-bubble);border-bottom-left-radius:4px;border:1px solid var(–border)}
+.msg-time{font-size:9.5px;color:var(–text-muted);margin-top:3px;padding:0 4px}
+.msg-footer{display:flex;align-items:center;gap:8px;margin-top:3px;padding:0 2px}
+.play-btn{background:none;border:none;color:var(–orb-a);font-family:‘DM Sans’,sans-serif;font-size:11px;cursor:pointer;padding:2px 6px;border-radius:10px;transition:all 0.2s;border:1px solid rgba(155,127,212,0.3)}
+.play-btn:hover{background:rgba(155,127,212,0.1)}
+.typing-indicator{display:flex;align-items:center;gap:5px;padding:11px 14px;background:var(–bot-bubble);border-radius:17px;border-bottom-left-radius:4px;border:1px solid var(–border);width:fit-content}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(–text-muted);animation:bounce 1.2s infinite}
+.typing-indicator span:nth-child(2){animation-delay:.15s}.typing-indicator span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+
+/* EXERCISE CARDS */
+.exercise-card{background:var(–surface);border:1px solid var(–border);border-radius:14px;padding:13px;margin:2px 0;width:100%;max-width:280px;animation:fadeUp 0.3s ease forwards;opacity:0}
+.exercise-card-title{font-family:‘Playfair Display’,serif;font-size:14px;margin-bottom:4px}
+.exercise-card-desc{font-size:11.5px;color:var(–text-muted);line-height:1.6;margin-bottom:10px}
+.exercise-start-btn{width:100%;padding:8px;border-radius:10px;background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border:none;color:white;font-family:‘DM Sans’,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:opacity 0.2s}
+
+/* EXERCISE MODAL */
+#exercise-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(10,9,18,0.92);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;padding:22px}
+#exercise-modal.open{display:flex}
+.modal-box{background:var(–surface);border:1px solid var(–border);border-radius:22px;padding:24px 18px;width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;position:relative}
+.modal-close{position:absolute;top:13px;right:14px;background:none;border:none;color:var(–text-muted);font-size:19px;cursor:pointer}
+.modal-icon{font-size:40px}.modal-title{font-family:‘Playfair Display’,serif;font-size:18px}
+.modal-step-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(–text-muted)}
+#breath-circle{width:106px;height:106px;border-radius:50%;background:radial-gradient(circle,var(–orb-a),var(–orb-b));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:white;transition:transform 0s;box-shadow:0 0 26px var(–orb-glow)}
+#breath-circle.inhale{transition:transform 4s ease-in-out;transform:scale(1.4)}
+#breath-circle.hold{transform:scale(1.4)}
+#breath-circle.exhale{transition:transform 4s ease-in-out;transform:scale(1)}
+.modal-progress-wrap{width:100%;background:var(–surface2);border-radius:8px;height:5px;overflow:hidden}
+.modal-progress-bar{height:100%;background:linear-gradient(90deg,var(–orb-a),var(–orb-b));border-radius:8px;transition:width 0.3s}
+#affirmation-text{font-family:‘Playfair Display’,serif;font-size:16px;line-height:1.55;color:var(–text);min-height:72px;display:flex;align-items:center;justify-content:center}
+#grounding-list{width:100%;display:flex;flex-direction:column;gap:6px}
+.grounding-item{background:var(–surface2);border:1px solid var(–border);border-radius:11px;padding:8px 12px;font-size:12.5px;color:var(–text-muted);text-align:left;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s}
+.grounding-item.done{border-color:rgba(82,183,136,0.5);color:var(–text);background:rgba(82,183,136,0.08)}
+.grounding-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(–text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;transition:all 0.2s}
+.grounding-item.done .grounding-check{background:#52b788;border-color:#52b788;color:white}
+.modal-btn{padding:11px 28px;border-radius:13px;background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border:none;color:white;font-family:‘DM Sans’,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;width:100%}
+.modal-btn-ghost{padding:9px;background:none;border:1px solid var(–border);border-radius:13px;color:var(–text-muted);font-family:‘DM Sans’,sans-serif;font-size:12.5px;cursor:pointer;width:100%;transition:all 0.2s}
+.modal-btn-ghost:hover{border-color:var(–orb-a);color:var(–orb-a)}
+
+/* SUGGESTIONS */
+#suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 6px;flex-shrink:0}
+.suggestion-btn{background:var(–surface2);border:1px solid var(–border);color:var(–text-muted);font-family:‘DM Sans’,sans-serif;font-size:11px;padding:5px 10px;border-radius:18px;cursor:pointer;transition:all 0.2s}
+.suggestion-btn:hover{border-color:var(–orb-a);color:var(–orb-a)}
+
+/* WELCOME */
+#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:12px 22px;text-align:center}
+.welcome-sub{font-size:13px;color:var(–text-muted);line-height:1.7;max-width:280px}
+.welcome-starters{margin-top:16px;display:flex;flex-direction:column;gap:7px;width:100%;max-width:320px}
+.starter-btn{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:10px 13px;text-align:left;cursor:pointer;color:var(–text);font-family:‘DM Sans’,sans-serif;font-size:12.5px;line-height:1.5;transition:all 0.2s;display:flex;align-items:center;gap:8px}
+.starter-btn:hover{border-color:rgba(155,127,212,0.4);background:var(–surface2)}
+.starter-icon{font-size:15px;flex-shrink:0}
+.disclaimer{font-size:9.5px;color:var(–text-muted);text-align:center;padding:0 20px 4px;opacity:0.6;flex-shrink:0}
+#input-area{padding:7px 12px 14px;display:flex;gap:8px;align-items:flex-end;border-top:1px solid var(–border);background:rgba(15,14,23,0.9);backdrop-filter:blur(12px);flex-shrink:0}
+#user-input{flex:1;background:var(–surface2);border:1px solid var(–border);border-radius:21px;padding:9px 13px;font-family:‘DM Sans’,sans-serif;font-size:13.5px;color:var(–text);resize:none;outline:none;max-height:96px;min-height:40px;line-height:1.5;transition:border-color 0.2s;overflow-y:auto}
+#user-input::-webkit-scrollbar{width:0}
+#user-input:focus{border-color:rgba(155,127,212,0.4)}
+#user-input::placeholder{color:var(–text-muted)}
+#send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.15s,opacity 0.15s;box-shadow:0 4px 12px rgba(155,127,212,0.3)}
+#send-btn:hover{transform:scale(1.05)}#send-btn:active{transform:scale(0.95)}#send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+#send-btn svg{width:17px;height:17px;fill:white}
+#mic-btn{width:40px;height:40px;border-radius:50%;background:var(–surface2);border:1px solid var(–border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-size:18px}
+#mic-btn:hover{border-color:var(–orb-a)}
+#mic-btn.recording{background:linear-gradient(135deg,#c1121f,#e63946);border-color:transparent;animation:micPulse 1s ease-in-out infinite;box-shadow:0 4px 14px rgba(193,18,31,0.4)}
+@keyframes micPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+#voice-bar{display:flex;align-items:center;gap:7px;padding:0 2px;flex-shrink:0}
+.voice-toggle-wrap{position:relative;width:34px;height:19px;flex-shrink:0}
+.voice-toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.voice-slider{width:34px;height:19px;border-radius:19px;background:var(–surface2);border:1px solid var(–border);display:block;cursor:pointer;transition:background 0.3s;position:relative}
+.voice-slider::before{content:’’;position:absolute;width:13px;height:13px;left:2px;top:2px;border-radius:50%;background:var(–text-muted);transition:all 0.3s}
+.voice-toggle-wrap input:checked+.voice-slider{background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border-color:transparent}
+.voice-toggle-wrap input:checked+.voice-slider::before{transform:translateX(15px);background:white}
+.voice-label{font-size:10px;color:var(–text-muted);white-space:nowrap}
+#speaking-indicator{display:none;position:absolute;bottom:68px;left:50%;transform:translateX(-50%);background:var(–surface);border:1px solid var(–border);border-radius:20px;padding:6px 14px;font-size:11.5px;color:var(–text-muted);white-space:nowrap;z-index:10;box-shadow:0 4px 14px rgba(0,0,0,0.3);align-items:center;gap:6px}
+#speaking-indicator.show{display:flex}
+.speak-dot{width:6px;height:6px;border-radius:50%;background:var(–orb-a);animation:bounce 1.2s infinite}
+.speak-dot:nth-child(2){animation-delay:.15s}.speak-dot:nth-child(3){animation-delay:.3s}
+
+/* ── MOOD SCREEN ── */
+#mood-screen{overflow-y:auto;padding:16px 14px 26px;gap:14px}
+#mood-screen::-webkit-scrollbar{width:0}
+.mood-section-title{font-family:‘Playfair Display’,serif;font-size:18px;font-weight:400;margin-bottom:2px}
+.mood-section-sub{font-size:11.5px;color:var(–text-muted);margin-bottom:12px}
+#mood-picker{background:var(–surface);border:1px solid var(–border);border-radius:18px;padding:16px 13px;display:flex;flex-direction:column;align-items:center;gap:13px}
+.mood-picker-label{font-size:12.5px;color:var(–text-muted)}
+.mood-emojis{display:flex;gap:7px;justify-content:center}
+.mood-emoji-btn{width:48px;height:48px;border-radius:50%;border:2px solid transparent;background:var(–surface2);font-size:23px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.mood-emoji-btn:hover{transform:scale(1.1);border-color:rgba(155,127,212,0.4)}
+.mood-emoji-btn.selected{border-color:var(–orb-a);background:rgba(155,127,212,0.15);transform:scale(1.12)}
+.mood-emoji-label{font-size:10px;color:var(–text-muted);margin-top:2px}
+#mood-note{width:100%;background:var(–surface2);border:1px solid var(–border);border-radius:13px;padding:9px 12px;font-family:‘DM Sans’,sans-serif;font-size:12.5px;color:var(–text);resize:none;outline:none;height:60px;line-height:1.5;transition:border-color 0.2s}
+#mood-note:focus{border-color:rgba(155,127,212,0.4)}#mood-note::placeholder{color:var(–text-muted)}
+#save-mood-btn{width:100%;padding:11px;border-radius:13px;background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border:none;color:white;font-family:‘DM Sans’,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(155,127,212,0.3)}
+.save-feedback{font-size:11.5px;color:#6fcf97;text-align:center;animation:fadeUp 0.3s ease forwards;opacity:0}
+#streak-card{background:var(–surface);border:1px solid var(–border);border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px}
+.streak-icon{font-size:28px}.streak-info h3{font-size:20px;font-weight:500}.streak-info p{font-size:11px;color:var(–text-muted);margin-top:2px}
+#calendar-wrap{background:var(–surface);border:1px solid var(–border);border-radius:18px;padding:14px 12px}
+.cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cal-month{font-family:‘Playfair Display’,serif;font-size:14.5px}
+.cal-nav{background:none;border:none;color:var(–text-muted);font-size:17px;cursor:pointer;padding:3px 7px;border-radius:7px}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px}
+.cal-day-name{font-size:9px;color:var(–text-muted);letter-spacing:0.05em;padding:3px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-cell{aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(–text-muted);position:relative;cursor:default;transition:transform 0.15s}
+.cal-cell.today{border:1.5px solid rgba(155,127,212,0.5);color:var(–text)}
+.cal-cell.has-mood{cursor:pointer}.cal-cell.has-mood:hover{transform:scale(1.1)}
+.cal-cell-emoji{font-size:17px}.cal-cell-num{font-size:8.5px;position:absolute;bottom:1px;right:3px;opacity:0.6}
+.mood-legend{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:9px}
+.legend-item{display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(–text-muted)}
+#mood-tooltip{display:none;position:fixed;background:var(–surface2);border:1px solid var(–border);border-radius:11px;padding:9px 12px;font-size:12.5px;color:var(–text);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:100;max-width:190px;text-align:center;pointer-events:none}
+
+/* ── SETTINGS / PROFILE SCREEN ── */
+#settings-screen{overflow-y:auto;padding:18px 15px 30px;gap:16px}
+#settings-screen::-webkit-scrollbar{width:0}
+.settings-title{font-family:‘Playfair Display’,serif;font-size:19px;font-weight:400;margin-bottom:2px}
+.settings-sub{font-size:12px;color:var(–text-muted);margin-bottom:14px}
+.settings-card{background:var(–surface);border:1px solid var(–border);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.settings-row{display:flex;align-items:center;gap:12px}
+.settings-avatar-pick{display:flex;gap:8px;flex-wrap:wrap}
+.settings-avatar-opt{width:44px;height:44px;border-radius:50%;background:var(–surface2);border:2px solid transparent;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.settings-avatar-opt.selected{border-color:var(–orb-a);background:rgba(155,127,212,0.15)}
+.settings-label{font-size:12.5px;color:var(–text-muted);margin-bottom:5px}
+.settings-input{width:100%;background:var(–surface2);border:1px solid var(–border);border-radius:12px;padding:10px 13px;font-family:‘DM Sans’,sans-serif;font-size:13.5px;color:var(–text);outline:none;transition:border-color 0.2s}
+.settings-input:focus{border-color:rgba(155,127,212,0.4)}
+.settings-save-btn{width:100%;padding:12px;border-radius:13px;background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border:none;color:white;font-family:‘DM Sans’,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(155,127,212,0.3)}
+
+/* NOTIFICATIONS CARD */
+.notif-card{background:var(–surface);border:1px solid var(–border);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.notif-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.notif-info strong{font-size:13.5px;display:block;margin-bottom:2px}
+.notif-info span{font-size:11.5px;color:var(–text-muted)}
+.toggle-wrap{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;border-radius:24px;background:var(–surface2);border:1px solid var(–border);cursor:pointer;transition:background 0.3s}
+.toggle-slider::before{content:’’;position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:var(–text-muted);transition:all 0.3s}
+.toggle-wrap input:checked+.toggle-slider{background:linear-gradient(135deg,var(–orb-a),var(–orb-b));border-color:transparent}
+.toggle-wrap input:checked+.toggle-slider::before{transform:translateX(20px);background:white}
+.notif-time-row{display:flex;align-items:center;gap:8px}
+.notif-time-label{font-size:12px;color:var(–text-muted);min-width:60px}
+.notif-time-input{background:var(–surface2);border:1px solid var(–border);border-radius:9px;padding:6px 10px;font-family:‘DM Sans’,sans-serif;font-size:13px;color:var(–text);outline:none;width:90px;transition:border-color 0.2s}
+.notif-time-input:focus{border-color:rgba(155,127,212,0.4)}
+.notif-test-btn{width:100%;padding:10px;border-radius:12px;background:var(–surface2);border:1px solid var(–border);color:var(–text-muted);font-family:‘DM Sans’,sans-serif;font-size:12.5px;cursor:pointer;transition:all 0.2s}
+.notif-test-btn:hover{border-color:var(–orb-a);color:var(–orb-a)}
+.notif-status{font-size:11px;color:#6fcf97;text-align:center;display:none}
+.danger-btn{width:100%;padding:10px;border-radius:12px;background:none;border:1px solid rgba(193,18,31,0.3);color:rgba(193,18,31,0.7);font-family:‘DM Sans’,sans-serif;font-size:12.5px;cursor:pointer;transition:all 0.2s;margin-top:4px}
+.danger-btn:hover{border-color:#c1121f;color:#c1121f}
+</style>
+
+</head>
+<body>
+
+<!-- ONBOARDING -->
+
+<div id="onboarding" class="show">
+<div class="ob-orb">🌙</div>
+<h1 class="ob-title">Hola, soy Serena</h1>
+<p class="ob-sub">Tu espacio seguro para hablar, sentir y cuidarte. ¿Cómo te llamas?</p>
+<input class="ob-input" id="ob-name" type="text" placeholder="Tu nombre..." maxlength="24" autocomplete="off">
+<p class="ob-label">Elige tu avatar</p>
+<div class="ob-avatars">
+<div class="ob-avatar selected" data-av="🌙" onclick="selectObAvatar(this)">🌙</div>
+<div class="ob-avatar" data-av="🌸" onclick="selectObAvatar(this)">🌸</div>
+<div class="ob-avatar" data-av="⭐" onclick="selectObAvatar(this)">⭐</div>
+<div class="ob-avatar" data-av="🦋" onclick="selectObAvatar(this)">🦋</div>
+<div class="ob-avatar" data-av="🌿" onclick="selectObAvatar(this)">🌿</div>
+<div class="ob-avatar" data-av="🔮" onclick="selectObAvatar(this)">🔮</div>
+</div>
+<button class="ob-btn" onclick="finishOnboarding()">Comenzar ✨</button>
+</div>
+
+<div id="offline-pill">📵 Sin conexión</div>
+
+<div id="app">
+<!-- PROFILE BAR -->
+<div id="profile-bar">
+<div class="profile-avatar" id="profile-avatar" onclick="switchTab('settings')">🌙</div>
+<div class="profile-name" id="profile-name">Cargando...</div>
+<div class="profile-streak">🔥 <span id="profile-streak-num">0</span> días</div>
+</div>
+
+<!-- INSTALL BANNER -->
+
+<div id="install-banner">
+<div class="install-icon">📱</div>
+<div class="install-text"><strong>Instalar Serena</strong><span>Añadir a pantalla de inicio</span></div>
+<button class="install-btn" id="install-btn">Instalar</button>
+<button class="install-dismiss" onclick="dismissInstall()">✕</button>
+</div>
+
+<div id="tabs">
+<button class="tab-btn active" onclick="switchTab('chat')" id="tab-chat">🌙 Chat</button>
+<button class="tab-btn" onclick="switchTab('mood')" id="tab-mood">🌈 Estado</button>
+<button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">⚙️ Perfil</button>
+</div>
+
+<!-- CHAT -->
+
+<div class="screen active" id="chat-screen">
+<div id="orb-header">
+<div id="orb-wrap">
+<div id="orb-ring"></div>
+<div id="orb">
+<svg id="orb-face" viewBox="0 0 52 52" fill="none">
+<ellipse id="eye-l" cx="18" cy="22" rx="3" ry="3.5" fill="rgba(255,255,255,0.9)"/>
+<ellipse id="eye-r" cx="34" cy="22" rx="3" ry="3.5" fill="rgba(255,255,255,0.9)"/>
+<circle id="pupil-l" cx="18" cy="23" r="1.5" fill="rgba(0,0,0,0.45)"/>
+<circle id="pupil-r" cx="34" cy="23" r="1.5" fill="rgba(0,0,0,0.45)"/>
+<path id="mouth" d="M 19 33 Q 26 38 33 33" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
+<ellipse id="blush-l" cx="12" cy="30" rx="5" ry="3" fill="rgba(255,180,180,0)"/>
+<ellipse id="blush-r" cx="40" cy="30" rx="5" ry="3" fill="rgba(255,180,180,0)"/>
+</svg>
+</div>
+</div>
+<div id="emotion-label">Tranquila</div>
+<div class="orb-name">Serena</div>
+<div class="status"><div class="status-dot"></div><span>Aquí contigo</span></div>
+</div>
+<div id="welcome">
+<p class="welcome-sub">Este es tu espacio seguro.<br>Cuéntame lo que sientes.</p>
+<div class="welcome-starters">
+<button class="starter-btn" onclick="startChat('Me siento ansioso/a y no sé por qué')"><span class="starter-icon">😔</span> Me siento ansioso/a y no sé por qué</button>
+<button class="starter-btn" onclick="startChat('He tenido un día muy difícil')"><span class="starter-icon">🌧️</span> He tenido un día muy difícil</button>
+<button class="starter-btn" onclick="startChat('Necesito desahogarme')"><span class="starter-icon">💬</span> Necesito desahogarme</button>
+<button class="starter-btn" onclick="startChat('Hoy me siento bien y quiero compartirlo')"><span class="starter-icon">✨</span> Hoy me siento bien</button>
+</div>
+</div>
+<div id="messages" style="display:none;"></div>
+<div id="suggestions" style="display:none;"></div>
+<div class="disclaimer">Serena es apoyo emocional — no reemplaza terapia profesional.</div>
+<div style="position:relative">
+<div id="speaking-indicator"><div class="speak-dot"></div><div class="speak-dot"></div><div class="speak-dot"></div><span>Serena está hablando…</span></div>
+</div>
+<div id="input-area">
+<button id="mic-btn" onclick="toggleMic()" title="Hablar">🎤</button>
+<textarea id="user-input" placeholder="Escribe o habla…" rows="1"></textarea>
+<div id="voice-bar">
+<label class="voice-toggle-wrap" title="Voz de Serena">
+<input type="checkbox" id="voice-toggle" checked>
+<span class="voice-slider"></span>
+</label>
+<span class="voice-label">🔊</span>
+</div>
+<button id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+</div>
+</div>
+
+<!-- MOOD -->
+
+<div class="screen" id="mood-screen">
+<div class="mood-section-title">¿Cómo estás hoy?</div>
+<div class="mood-section-sub">Registra tu estado de ánimo</div>
+<div id="mood-picker">
+<div class="mood-picker-label">Toca el emoji que mejor te describe</div>
+<div class="mood-emojis">
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="mood-emoji-btn" data-mood="terrible" onclick="selectMood(this)">😭</button><span class="mood-emoji-label">Muy mal</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="mood-emoji-btn" data-mood="bad" onclick="selectMood(this)">😟</button><span class="mood-emoji-label">Mal</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="mood-emoji-btn" data-mood="okay" onclick="selectMood(this)">😐</button><span class="mood-emoji-label">Regular</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="mood-emoji-btn" data-mood="good" onclick="selectMood(this)">😊</button><span class="mood-emoji-label">Bien</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="mood-emoji-btn" data-mood="great" onclick="selectMood(this)">😄</button><span class="mood-emoji-label">Genial</span></div>
+</div>
+<textarea id="mood-note" placeholder="Nota opcional: ¿qué influyó en tu estado de hoy?"></textarea>
+<button id="save-mood-btn" onclick="saveMood()">Guardar estado de hoy</button>
+<div id="save-feedback" class="save-feedback" style="display:none;">✓ Estado guardado</div>
+</div>
+<div id="streak-card"><div class="streak-icon">🔥</div><div class="streak-info"><h3 id="streak-count">0 días</h3><p>racha de registros consecutivos</p></div></div>
+<div id="calendar-wrap">
+<div class="cal-header">
+<button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+<div class="cal-month" id="cal-month-label"></div>
+<button class="cal-nav" onclick="changeMonth(1)">›</button>
+</div>
+<div class="cal-days-header">
+<div class="cal-day-name">Dom</div><div class="cal-day-name">Lun</div><div class="cal-day-name">Mar</div>
+<div class="cal-day-name">Mié</div><div class="cal-day-name">Jue</div><div class="cal-day-name">Vie</div><div class="cal-day-name">Sáb</div>
+</div>
+<div class="cal-grid" id="cal-grid"></div>
+<div class="mood-legend">
+<div class="legend-item"><span>😭</span>Muy mal</div><div class="legend-item"><span>😟</span>Mal</div>
+<div class="legend-item"><span>😐</span>Regular</div><div class="legend-item"><span>😊</span>Bien</div><div class="legend-item"><span>😄</span>Genial</div>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+
+<div class="screen" id="settings-screen">
+<div class="settings-title">Tu perfil</div>
+<div class="settings-sub">Personaliza tu experiencia con Serena</div>
+
+```
+<div class="settings-card">
+<div>
+<div class="settings-label">Tu nombre</div>
+<input class="settings-input" id="settings-name" type="text" placeholder="Tu nombre..." maxlength="24">
+</div>
+<div>
+<div class="settings-label">Tu avatar</div>
+<div class="settings-avatar-pick" id="settings-avatars">
+<div class="settings-avatar-opt" data-av="🌙" onclick="selectSettingsAvatar(this)">🌙</div>
+<div class="settings-avatar-opt" data-av="🌸" onclick="selectSettingsAvatar(this)">🌸</div>
+<div class="settings-avatar-opt" data-av="⭐" onclick="selectSettingsAvatar(this)">⭐</div>
+<div class="settings-avatar-opt" data-av="🦋" onclick="selectSettingsAvatar(this)">🦋</div>
+<div class="settings-avatar-opt" data-av="🌿" onclick="selectSettingsAvatar(this)">🌿</div>
+<div class="settings-avatar-opt" data-av="🔮" onclick="selectSettingsAvatar(this)">🔮</div>
+</div>
+</div>
+<button class="settings-save-btn" onclick="saveProfile()">Guardar perfil</button>
+</div>
+
+<div class="notif-card">
+<div><strong style="font-size:15px">🔔 Notificaciones</strong><p style="font-size:11.5px;color:var(--text-muted);margin-top:3px">Recordatorios diarios de bienestar</p></div>
+
+<div class="notif-row">
+<div class="notif-info"><strong>🌅 Mañana</strong><span id="notif-morning-time-label">08:00</span></div>
+<label class="toggle-wrap"><input type="checkbox" id="toggle-morning" onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+</div>
+<div class="notif-time-row" id="morning-time-row">
+<span class="notif-time-label">Hora:</span>
+<input class="notif-time-input" type="time" id="time-morning" value="08:00" onchange="saveNotifSettings()">
+</div>
+
+<div class="notif-row">
+<div class="notif-info"><strong>☀️ Mediodía</strong><span id="notif-midday-time-label">13:00</span></div>
+<label class="toggle-wrap"><input type="checkbox" id="toggle-midday" onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+</div>
+<div class="notif-time-row" id="midday-time-row">
+<span class="notif-time-label">Hora:</span>
+<input class="notif-time-input" type="time" id="time-midday" value="13:00" onchange="saveNotifSettings()">
+</div>
+
+<div class="notif-row">
+<div class="notif-info"><strong>🌙 Noche</strong><span id="notif-night-time-label">21:00</span></div>
+<label class="toggle-wrap"><input type="checkbox" id="toggle-night" onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+</div>
+<div class="notif-time-row" id="night-time-row">
+<span class="notif-time-label">Hora:</span>
+<input class="notif-time-input" type="time" id="time-night" value="21:00" onchange="saveNotifSettings()">
+</div>
+
+<button class="notif-test-btn" onclick="testNotification()">🔔 Enviar notificación de prueba</button>
+<div class="notif-status" id="notif-status">✓ Notificación enviada</div>
+</div>
+
+<div class="settings-card">
+<div><strong style="font-size:14px">Datos</strong><p style="font-size:11.5px;color:var(--text-muted);margin-top:3px">Tu historial se guarda solo en este dispositivo.</p></div>
+<button class="danger-btn" onclick="resetData()">🗑️ Borrar todos mis datos</button>
+</div>
+```
+
+</div>
+</div>
+
+<!-- EXERCISE MODAL -->
+
+<div id="exercise-modal">
+<div class="modal-box">
+<button class="modal-close" onclick="closeExercise()">✕</button>
+<div class="modal-icon" id="modal-icon"></div>
+<div class="modal-title" id="modal-title"></div>
+<div class="modal-step-label" id="modal-step-label"></div>
+<div id="modal-body"></div>
+<div class="modal-progress-wrap" id="modal-progress-wrap" style="display:none"><div class="modal-progress-bar" id="modal-progress-bar" style="width:0%"></div></div>
+<div id="modal-actions"></div>
+</div>
+</div>
+<div id="mood-tooltip"></div>
+
+<script>
+/* ══ PWA ══ */
+let deferredPrompt=null;
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!localStorage.getItem('serena_install_dismissed')){document.getElementById('install-banner').classList.add('show');}});
+document.getElementById('install-btn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('install-banner').classList.remove('show');});
+function dismissInstall(){document.getElementById('install-banner').classList.remove('show');localStorage.setItem('serena_install_dismissed','1');}
+window.addEventListener('online',()=>document.getElementById('offline-pill').classList.remove('show'));
+window.addEventListener('offline',()=>document.getElementById('offline-pill').classList.add('show'));
+if(!navigator.onLine)document.getElementById('offline-pill').classList.add('show');
+
+/* ══ PROFILE ══ */
+let profile = JSON.parse(localStorage.getItem('serena_profile')||'{}');
+let obAvatar = '🌙';
+
+function selectObAvatar(el){document.querySelectorAll('.ob-avatar').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');obAvatar=el.dataset.av;}
+
+function finishOnboarding(){
+const name = document.getElementById('ob-name').value.trim() || 'Amig@';
+profile = { name, avatar: obAvatar };
+localStorage.setItem('serena_profile', JSON.stringify(profile));
+document.getElementById('onboarding').classList.remove('show');
+applyProfile();
+requestNotifPermission();
+initApp();
+}
+
+function applyProfile(){
+const p = profile;
+document.getElementById('profile-avatar').textContent = p.avatar || '🌙';
+document.getElementById('profile-name').textContent = p.name || 'Amig@';
+document.getElementById('settings-name').value = p.name || '';
+document.querySelectorAll('.settings-avatar-opt').forEach(el=>{
+el.classList.toggle('selected', el.dataset.av === (p.avatar||'🌙'));
+});
+}
+
+function selectSettingsAvatar(el){document.querySelectorAll('.settings-avatar-opt').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');}
+
+function saveProfile(){
+const name = document.getElementById('settings-name').value.trim() || 'Amig@';
+const avatar = document.querySelector('.settings-avatar-opt.selected')?.dataset.av || '🌙';
+profile = { name, avatar };
+localStorage.setItem('serena_profile', JSON.stringify(profile));
+applyProfile();
+const btn = document.querySelector('.settings-save-btn');
+btn.textContent = '✓ Guardado'; setTimeout(()=>{ btn.textContent = 'Guardar perfil'; }, 1500);
+}
+
+function resetData(){
+if(!confirm('¿Borrar todos tus datos? Esta acción no se puede deshacer.')) return;
+localStorage.clear();
+location.reload();
+}
+
+/* ══ NOTIFICATIONS ══ */
+let notifSettings = JSON.parse(localStorage.getItem('serena_notif')||'{"morning":true,"midday":true,"night":true,"timeMorning":"08:00","timeMidday":"13:00","timeNight":"21:00"}');
+let notifTimers = {};
+
+async function requestNotifPermission(){
+if(!('Notification' in window)) return;
+if(Notification.permission === 'default'){
+const perm = await Notification.requestPermission();
+if(perm === 'granted') scheduleNotifications();
+} else if(Notification.permission === 'granted'){
+scheduleNotifications();
+}
+}
+
+function loadNotifSettings(){
+document.getElementById('toggle-morning').checked = notifSettings.morning;
+document.getElementById('toggle-midday').checked = notifSettings.midday;
+document.getElementById('toggle-night').checked = notifSettings.night;
+document.getElementById('time-morning').value = notifSettings.timeMorning || '08:00';
+document.getElementById('time-midday').value = notifSettings.timeMidday || '13:00';
+document.getElementById('time-night').value = notifSettings.timeNight || '21:00';
+}
+
+function saveNotifSettings(){
+notifSettings = {
+morning: document.getElementById('toggle-morning').checked,
+midday: document.getElementById('toggle-midday').checked,
+night: document.getElementById('toggle-night').checked,
+timeMorning: document.getElementById('time-morning').value,
+timeMidday: document.getElementById('time-midday').value,
+timeNight: document.getElementById('time-night').value,
+};
+localStorage.setItem('serena_notif', JSON.stringify(notifSettings));
+scheduleNotifications();
+}
+
+function scheduleNotifications(){
+// Clear old timers
+Object.values(notifTimers).forEach(clearTimeout);
+notifTimers = {};
+if(Notification.permission !== 'granted') return;
+
+const slots = [
+{ key:'morning', enabled: notifSettings.morning, time: notifSettings.timeMorning || '08:00' },
+{ key:'midday', enabled: notifSettings.midday, time: notifSettings.timeMidday || '13:00' },
+{ key:'night', enabled: notifSettings.night, time: notifSettings.timeNight || '21:00' },
+];
+
+slots.forEach(({key, enabled, time}) => {
+if(!enabled) return;
+const [h, m] = time.split(':').map(Number);
+const now = new Date();
+const target = new Date();
+target.setHours(h, m, 0, 0);
+if(target <= now) target.setDate(target.getDate() + 1);
+const delay = target - now;
+
+notifTimers[key] = setTimeout(() => {
+fireNotification(key);
+// Reschedule daily
+notifTimers[key+'_interval'] = setInterval(() => fireNotification(key), 24*60*60*1000);
+}, delay);
+});
+}
+
+const NOTIF_MSGS = {
+morning:[
+{title:'Buenos días 🌅',body:'Un nuevo día, una nueva oportunidad. ¿Cómo amaneciste hoy?'},
+{title:'Serena te saluda 🌙',body:'Antes de empezar el día, respira. Estoy aquí si me necesitas.'},
+{title:'Empieza bien el día ✨',body:'Registra cómo te sientes esta mañana.'},
+{title:'¡Hola! 🌸',body:'Tu mensaje de hoy está listo. Tómate un momento para ti.'},
+],
+midday:[
+{title:'Check-in del mediodía 🌤️',body:'¿Cómo vas? Un momento de pausa lo cambia todo.'},
+{title:'Pausa de bienestar ☀️',body:'Respira profundo. ¿Necesitas desahogarte o calmarte?'},
+{title:'A mitad del día 💬',body:'¿Cómo está tu energía? Cuéntame, estoy aquí.'},
+{title:'Un momento para ti 🌿',body:'¿Qué tal un ejercicio rápido de 2 minutos?'},
+],
+night:[
+{title:'Reflexión nocturna 🌙',body:'¿Cómo fue tu día? Escríbelo o simplemente desahógate.'},
+{title:'Antes de dormir 🌟',body:'Registra tu estado de ánimo de hoy.'},
+{title:'Buenas noches ✨',body:'El día terminó. ¿Qué quieres soltar antes de descansar?'},
+{title:'Tu espacio seguro 💜',body:'Estoy aquí para escucharte antes de que cierres los ojos.'},
+],
+};
+
+function fireNotification(slot){
+const arr = NOTIF_MSGS[slot];
+const msg = arr[Math.floor(Math.random()*arr.length)];
+if(Notification.permission==='granted'){
+new Notification(msg.title,{body:msg.body,icon:'./icon-192.png',tag:'serena-'+slot});
+}
+}
+
+function testNotification(){
+if(Notification.permission !== 'granted'){
+requestNotifPermission().then(()=>{
+if(Notification.permission==='granted') fireNotification('morning');
+});
+return;
+}
+fireNotification('morning');
+const s = document.getElementById('notif-status');
+s.style.display='block'; setTimeout(()=>{ s.style.display='none'; },2500);
+}
+
+/* ══ DAILY MESSAGES ══ */
+const DAILY_MESSAGES=["Cada día que decides seguir adelante es una victoria que merece celebrarse.","No tienes que tenerlo todo resuelto. Solo tienes que seguir dando un paso a la vez.","Tus emociones son válidas. Sentir no es debilidad — es ser humano.","El autocuidado no es egoísmo. Es la base desde la que puedes darlo todo.","Eres más resiliente de lo que crees. Ya has superado días difíciles antes.","Hoy no tienes que ser perfecto/a. Solo tienes que ser tú.","La calma no es la ausencia de tormentas — es aprender a respirar dentro de ellas.","Pequeños pasos también son progreso. No te subestimes.","Mereces el mismo amor y paciencia que le das a los demás.","Cada amanecer trae consigo la posibilidad de empezar de nuevo.","Tu historia no ha terminado. El capítulo difícil no es el último.","Está bien pedir ayuda. La fortaleza también se construye con otros.","No todo tiene que estar bien para que tú estés bien.","Confía en el proceso, incluso cuando no puedas ver el resultado.","Hoy, date permiso de simplemente ser.","Tu presencia en este mundo importa más de lo que imaginas.","Las heridas que sanan dejan marcas de sabiduría, no de derrota.","Respira. Este momento también pasará.","Eres suficiente, exactamente como eres hoy.","El descanso también es productivo.","La autocompasión no es rendirse — es tratarte con la bondad que mereces.","Cada vez que te levantas después de caer, te vuelves un poco más tú.","No compares tu proceso con el de nadie más. Tu camino es único.","Tienes más recursos internos de los que reconoces en este momento.","Hoy basta con hacer lo que puedas. Eso es suficiente.","Las emociones difíciles son mensajes, no condenas.","Eres capaz de sostener más de lo que crees.","Celebra lo pequeño. El desayuno, el sol, una respiración profunda.","Tu bienestar es una prioridad, no una opción.","Estás aquí, y eso ya es un comienzo."];
+function getDailyMessage(){return DAILY_MESSAGES[(new Date().getDate()-1)%DAILY_MESSAGES.length];}
+
+/* ══ EXERCISES ══ */
+let exerciseTimer=null,breathPhase=0,breathCycle=0;
+const BREATH_CYCLES=4;
+const GROUNDING_STEPS=[{n:5,sense:'VER',prompt:'Nombra 5 cosas que puedes ver ahora mismo.'},{n:4,sense:'TOCAR',prompt:'Nombra 4 cosas que puedes tocar.'},{n:3,sense:'OÍR',prompt:'Nombra 3 sonidos que escuchas.'},{n:2,sense:'OLER',prompt:'Nombra 2 cosas que puedes oler.'},{n:1,sense:'SABOREAR',prompt:'Nombra 1 sabor que percibes en este momento.'}];
+const PMR_STEPS=[{muscle:'Manos y brazos',emoji:'🤲',action:'Aprieta ambos puños con fuerza durante 7 segundos…',release:'Suelta y siente cómo la tensión se disuelve.'},{muscle:'Hombros',emoji:'🫱',action:'Sube los hombros hasta las orejas durante 7 segundos…',release:'Déjalos caer. Siente el alivio.'},{muscle:'Cara',emoji:'😬',action:'Arruga toda la cara 7 segundos…',release:'Relaja completamente. Respira.'},{muscle:'Abdomen',emoji:'🫀',action:'Contrae el abdomen con fuerza 7 segundos…',release:'Suelta y observa la diferencia.'},{muscle:'Piernas y pies',emoji:'🦵',action:'Estira las piernas y apunta los pies hacia arriba, 7 segundos…',release:'Suelta. Siente el cuerpo relajado.'}];
+const AFFIRMATIONS=["Soy capaz de superar los desafíos que se presentan en mi vida.","Merezco amor, paz y bienestar.","Mis emociones son válidas y las acepto con compasión.","Tengo la fortaleza para enfrentar este momento.","Estoy aprendiendo y creciendo cada día.","Me permito descansar sin culpa.","Soy suficiente exactamente como soy.","Elijo soltar lo que no puedo controlar.","Mi bienestar es una prioridad.","Confío en mi proceso y en mi camino."];
+let groundingIndex=0,groundingDone=[],pmrIndex=0,pmrPhase='tense',affirmIdx=0;
+
+function openExercise(t){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.add('open');if(t==='breath')startBreathing();else if(t==='ground')startGrounding();else if(t==='affirm')startAffirmations();else if(t==='pmr')startPMR();else if(t==='motivation')showMotivation();}
+function closeExercise(){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.remove('open');const bc=document.getElementById('breath-circle');if(bc){bc.className='';bc.style.transform='scale(1)';}}
+function setModal({icon,title,stepLabel='',body='',actions='',showProgress=false,progress=0}){document.getElementById('modal-icon').textContent=icon;document.getElementById('modal-title').textContent=title;document.getElementById('modal-step-label').textContent=stepLabel;document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-actions').innerHTML=actions;const pw=document.getElementById('modal-progress-wrap');pw.style.display=showProgress?'block':'none';if(showProgress)document.getElementById('modal-progress-bar').style.width=progress+'%';}
+function startBreathing(){breathPhase=0;breathCycle=0;setModal({icon:'🌬️',title:'Respiración 4-4-4',body:`<div id="breath-circle">Prepárate</div><p style="font-size:12px;color:var(--text-muted);margin-top:8px">${BREATH_CYCLES} ciclos completos</p>`,showProgress:true,progress:0,actions:`<button class="modal-btn-ghost" onclick="closeExercise()">Terminar</button>`});setTimeout(runBreath,1500);}
+function runBreath(){if(breathCycle>=BREATH_CYCLES){setModal({icon:'✨',title:'¡Bien hecho!',stepLabel:'Ejercicio completado',body:`<p style="font-size:13.5px;color:var(--text-muted);line-height:1.7">Tu sistema nervioso se ha calmado.</p>`,actions:`<button class="modal-btn" onclick="closeExercise()">Volver al chat</button>`});return;}const phases=[{label:'Inhala…',cls:'inhale',secs:4},{label:'Sostén',cls:'hold',secs:4},{label:'Exhala…',cls:'exhale',secs:4},{label:'Sostén',cls:'hold',secs:4}];const p=phases[breathPhase];const bc=document.getElementById('breath-circle');if(!bc)return;bc.textContent=p.label;bc.className=p.cls;document.getElementById('modal-step-label').textContent=`Ciclo ${breathCycle+1} de ${BREATH_CYCLES}`;document.getElementById('modal-progress-bar').style.width=((breathCycle*4+breathPhase)/(BREATH_CYCLES*4)*100)+'%';exerciseTimer=setTimeout(()=>{breathPhase++;if(breathPhase>=4){breathPhase=0;breathCycle++;}runBreath();},p.secs*1000);}
+function startGrounding(){groundingIndex=0;groundingDone=[];renderGrounding();}
+function renderGrounding(){if(groundingIndex>=GROUNDING_STEPS.length){setModal({icon:'🌿',title:'¡Estás presente!',stepLabel:'Grounding completado',body:`<p style="font-size:13.5px;color:var(--text-muted);line-height:1.7">Has vuelto al momento presente.</p>`,actions:`<button class="modal-btn" onclick="closeExercise()">Volver al chat</button>`});return;}const step=GROUNDING_STEPS[groundingIndex];const items=Array.from({length:step.n},(_,i)=>`<div class="grounding-item ${groundingDone.includes(groundingIndex+'-'+i)?'done':''}" onclick="checkGrounding(${groundingIndex},${i},this)"><div class="grounding-check">${groundingDone.includes(groundingIndex+'-'+i)?'✓':''}</div><span>${i+1}. ${step.sense.toLowerCase()} algo…</span></div>`).join('');setModal({icon:'🌿',title:'Grounding 5-4-3-2-1',stepLabel:`Paso ${groundingIndex+1} de 5`,body:`<p style="font-size:12.5px;color:var(--text-muted);margin-bottom:9px">${step.prompt}</p><div id="grounding-list">${items}</div>`,showProgress:true,progress:(groundingIndex/GROUNDING_STEPS.length)*100,actions:`<button class="modal-btn" onclick="nextGrounding()">Siguiente →</button>`});}
+function checkGrounding(si,ii,el){const k=si+'-'+ii;if(!groundingDone.includes(k))groundingDone.push(k);el.classList.add('done');el.querySelector('.grounding-check').textContent='✓';}
+function nextGrounding(){groundingIndex++;renderGrounding();}
+function startAffirmations(){affirmIdx=Math.floor(Math.random()*AFFIRMATIONS.length);showAffirmation();}
+function showAffirmation(){setModal({icon:'💫',title:'Afirmación',body:`<div id="affirmation-text">"${AFFIRMATIONS[affirmIdx%AFFIRMATIONS.length]}"</div>`,actions:`<button class="modal-btn" onclick="nextAffirmation()">Otra afirmación</button><button class="modal-btn-ghost" style="margin-top:8px" onclick="closeExercise()">Llevar esta conmigo</button>`});}
+function nextAffirmation(){affirmIdx++;showAffirmation();}
+function startPMR(){pmrIndex=0;pmrPhase='tense';renderPMR();}
+function renderPMR(){if(pmrIndex>=PMR_STEPS.length){setModal({icon:'😌',title:'Relajación completa',stepLabel:'Ejercicio completado',body:`<p style="font-size:13.5px;color:var(--text-muted);line-height:1.7">Tu cuerpo ha liberado la tensión acumulada.</p>`,actions:`<button class="modal-btn" onclick="closeExercise()">Volver al chat</button>`});return;}const step=PMR_STEPS[pmrIndex];const isTense=pmrPhase==='tense';setModal({icon:step.emoji,title:'Relajación muscular',stepLabel:`${step.muscle} — ${isTense?'Tensión':'Liberación'}`,body:`<p style="font-size:13.5px;color:var(--text-muted);line-height:1.7">${isTense?step.action:step.release}</p>`,showProgress:true,progress:(pmrIndex/PMR_STEPS.length)*100,actions:`<button class="modal-btn" onclick="advancePMR()">${isTense?'Soltar ahora':'Continuar →'}</button>`});if(isTense){exerciseTimer=setTimeout(()=>{pmrPhase='release';renderPMR();},7000);}}
+function advancePMR(){clearInterval(exerciseTimer);if(pmrPhase==='tense'){pmrPhase='release';}else{pmrPhase='tense';pmrIndex++;}renderPMR();}
+function showMotivation(){setModal({icon:'🌅',title:'Mensaje del día',body:`<div id="affirmation-text" style="font-size:15.5px">"${getDailyMessage()}"</div>`,actions:`<button class="modal-btn" onclick="closeExercise()">Llevar esto conmigo</button>`});}
+function insertExerciseCards(types){const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;gap:7px;align-self:flex-start;max-width:280px;animation:fadeUp 0.3s ease forwards;opacity:0';types.forEach(type=>{const info={breath:{icon:'🌬️',title:'Respiración guiada',desc:'Técnica 4-4-4 para calmar el sistema nervioso.'},ground:{icon:'🌿',title:'Grounding 5-4-3-2-1',desc:'Vuelve al presente usando tus 5 sentidos.'},affirm:{icon:'💫',title:'Afirmaciones',desc:'Frases poderosas para reconectar contigo.'},pmr:{icon:'😌',title:'Relajación muscular',desc:'Libera la tensión física paso a paso.'},motivation:{icon:'🌅',title:'Mensaje del día',desc:'Una frase inspiradora para acompañarte.'}}[type];if(!info)return;const card=document.createElement('div');card.className='exercise-card';card.innerHTML=`<div class="exercise-card-title">${info.icon} ${info.title}</div><div class="exercise-card-desc">${info.desc}</div><button class="exercise-start-btn" onclick="openExercise('${type}')">Comenzar</button>`;wrap.appendChild(card);});messagesEl.appendChild(wrap);messagesEl.scrollTop=messagesEl.scrollHeight;}
+
+/* ══ ORB ══ */
+const EMOTIONS={calm:{label:'Tranquila',a:'#9b7fd4',b:'#c8a97e',glow:'rgba(155,127,212,0.35)',mouth:'M 19 33 Q 26 38 33 33',eyeRy:3.5,eyeCy:22,blush:0},happy:{label:'Feliz',a:'#f9c74f',b:'#f4845f',glow:'rgba(249,199,79,0.4)',mouth:'M 17 32 Q 26 40 35 32',eyeRy:2.5,eyeCy:21,blush:0.18},sad:{label:'Acompañándote',a:'#4a6fa5',b:'#7b8fb7',glow:'rgba(74,111,165,0.35)',mouth:'M 19 36 Q 26 31 33 36',eyeRy:3.8,eyeCy:23,blush:0},anxious:{label:'Presente',a:'#e07a5f',b:'#c17b5c',glow:'rgba(224,122,95,0.35)',mouth:'M 20 34 Q 26 34 32 34',eyeRy:4.2,eyeCy:22,blush:0},angry:{label:'Escuchando',a:'#c1121f',b:'#e63946',glow:'rgba(193,18,31,0.3)',mouth:'M 19 36 Q 26 31 33 36',eyeRy:2.8,eyeCy:22,blush:0},surprised:{label:'Atenta',a:'#48cae4',b:'#90e0ef',glow:'rgba(72,202,228,0.35)',mouth:'M 21 33 Q 26 36 31 33',eyeRy:4.5,eyeCy:21,blush:0},grateful:{label:'Feliz por ti',a:'#52b788',b:'#74c69d',glow:'rgba(82,183,136,0.35)',mouth:'M 17 32 Q 26 40 35 32',eyeRy:2.5,eyeCy:21,blush:0.22}};
+function setEmotion(key){const e=EMOTIONS[key]||EMOTIONS.calm;document.documentElement.style.setProperty('--orb-a',e.a);document.documentElement.style.setProperty('--orb-b',e.b);document.documentElement.style.setProperty('--orb-glow',e.glow);const orb=document.getElementById('orb');orb.style.background=`radial-gradient(circle at 38% 35%, ${e.a}, ${e.b} 80%)`;orb.style.boxShadow=`0 0 22px ${e.glow}, inset 0 0 12px rgba(255,255,255,0.08)`;document.getElementById('mouth').setAttribute('d',e.mouth);['eye-l','eye-r'].forEach(id=>{document.getElementById(id).setAttribute('ry',e.eyeRy);document.getElementById(id).setAttribute('cy',e.eyeCy);});document.getElementById('pupil-l').setAttribute('cy',e.eyeCy+1);document.getElementById('pupil-r').setAttribute('cy',e.eyeCy+1);document.getElementById('blush-l').setAttribute('fill',`rgba(255,180,180,${e.blush})`);document.getElementById('blush-r').setAttribute('fill',`rgba(255,180,180,${e.blush})`);document.getElementById('emotion-label').textContent=e.label;orb.classList.remove('orb-ripple');void orb.offsetWidth;orb.classList.add('orb-ripple');setTimeout(()=>orb.classList.remove('orb-ripple'),700);}
+function setThinking(){const orb=document.getElementById('orb');orb.style.background='radial-gradient(circle at 38% 35%, #555, #333 80%)';orb.style.boxShadow='0 0 22px rgba(100,100,100,0.3)';document.getElementById('emotion-label').textContent='Pensando…';['eye-l','eye-r'].forEach(id=>document.getElementById(id).setAttribute('ry',1.4));document.getElementById('mouth').setAttribute('d','M 20 34 Q 26 34 32 34');}
+
+/* ══ CHAT ══ */
+const SYSTEM_PROMPT=`Eres Serena, una asistente de apoyo emocional cálida, empática y presente. El nombre del usuario es ${profile.name||'amig@'}.
+
+PRINCIPIOS:
+- Escucha primero, aconseja solo si te lo piden
+- Valida las emociones antes de responder
+- Tono cálido, cercano, natural — nunca clínico
+- Haz preguntas abiertas y suaves para profundizar
+- Nunca minimices el dolor
+- Responde siempre en español
+- Llama al usuario por su nombre de vez en cuando
+- Respuestas de 2-4 párrafos cortos máximo
+
+EJERCICIOS — cuando detectes que puede ayudar, agrega al final en línea nueva:
+EXERCISES:breath,ground,affirm,pmr,motivation (solo los relevantes, máximo 2)
+
+También al final en otra línea nueva:
+EMOTION:calm|EMOTION:happy|EMOTION:sad|EMOTION:anxious|EMOTION:angry|EMOTION:surprised|EMOTION:grateful
+
+LÍMITES:
+- No diagnostiques ni des consejos médicos
+- Si hay riesgo de autolesión, expresa preocupación y sugiere una línea de crisis`;
+
+let history=[],isTyping=false;
+const messagesEl=document.getElementById('messages');
+const welcomeEl=document.getElementById('welcome');
+const suggestionsEl=document.getElementById('suggestions');
+const inputEl=document.getElementById('user-input');
+const sendBtn=document.getElementById('send-btn');
+
+function getTime(){return new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});}
+function showChat(){welcomeEl.style.display='none';messagesEl.style.display='flex';suggestionsEl.style.display='flex';}
+let msgCounter=0;
+const XI_API_KEY = 'sk_a0fbcde283feaf27f84f8a3c0c6f832775516d76fc33fc54';
+const XI_VOICE_ID = 'imFXYz8XIletRKLZZQaA';
+let currentAudio = null;
+
+function cleanTextForTTS(text) {
+return text
+.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+.replace(/\*\*/g,'').replace(/\*/g,'')
+.replace(/#{1,6}\s/g,'')
+.replace(/\\n/g, '. ')
+.replace(/\n/g, '. ')
+.trim();
+}
+
+async function playMsg(id, text) {
+const btn = document.getElementById(id);
+// If audio is playing, stop it
+if (currentAudio && !currentAudio.paused) {
+currentAudio.pause();
+currentAudio = null;
+if (btn) btn.textContent = '▶ Escuchar';
+document.getElementById('speaking-indicator').classList.remove('show');
+return;
+}
+const clean = cleanTextForTTS(text);
+if (!clean) return;
+if (btn) { btn.textContent = '⏳ Cargando…'; btn.disabled = true; }
+document.getElementById('speaking-indicator').classList.add('show');
+try {
+const response = await fetch(
+'/.netlify/functions/tts',
+{
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ text: clean, voice_id: XI_VOICE_ID })
+}
+);
+if (!response.ok) throw new Error('ElevenLabs error ' + response.status);
+const blob = await response.blob();
+const url = URL.createObjectURL(blob);
+const audio = new Audio(url);
+currentAudio = audio;
+if (btn) { btn.textContent = '⏹ Detener'; btn.disabled = false; }
+audio.onended = () => {
+if (btn) btn.textContent = '▶ Escuchar';
+document.getElementById('speaking-indicator').classList.remove('show');
+URL.revokeObjectURL(url);
+currentAudio = null;
+};
+audio.onerror = () => {
+if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
+document.getElementById('speaking-indicator').classList.remove('show');
+currentAudio = null;
+};
+audio.play();
+} catch(err) {
+console.error('TTS error:', err);
+if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
+document.getElementById('speaking-indicator').classList.remove('show');
+}
+}
+function addMessage(text,role){
+const msg=document.createElement('div');
+msg.className=`msg ${role}`;
+if(role==='bot'){
+const id='msg-'+(++msgCounter);
+const safe=text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+msg.innerHTML=`<div class="bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-footer"><span class="msg-time">${getTime()}</span><button class="play-btn" id="${id}" onclick="playMsg('${id}','${safe}')">▶ Escuchar</button></div>`;
+}else{
+msg.innerHTML=`<div class="bubble">${text.replace(/\n/g,'<br>')}</div><span class="msg-time">${getTime()}</span>`;
+}
+messagesEl.appendChild(msg);messagesEl.scrollTop=messagesEl.scrollHeight;
+}
+function showTyping(){const el=document.createElement('div');el.className='msg bot';el.id='typing';el.innerHTML=`<div class="typing-indicator"><span></span><span></span><span></span></div>`;messagesEl.appendChild(el);messagesEl.scrollTop=messagesEl.scrollHeight;}
+function removeTyping(){const el=document.getElementById('typing');if(el)el.remove();}
+function showSuggestions(list){suggestionsEl.innerHTML='';list.forEach(({text,isEx})=>{const btn=document.createElement('button');btn.className='suggestion-btn'+(isEx?' exercise':'');btn.textContent=text;btn.onclick=()=>{inputEl.value=text;sendMessage();};suggestionsEl.appendChild(btn);});}
+
+async function callClaude(msg){
+history.push({role:'user',content:msg});
+const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:history})});
+const data=await res.json();
+let raw=data.content?.[0]?.text||'Lo siento, algo salió mal.';
+const em=raw.match(/EMOTION:(\w+)/);
+const ex=raw.match(/EXERCISES:([\w,]+)/);
+const emotionKey=(em&&EMOTIONS[em[1]])?em[1]:'calm';
+const exercises=ex?ex[1].split(',').map(s=>s.trim()):[];
+const reply=raw.replace(/\n?EMOTION:\w+/g,'').replace(/\n?EXERCISES:[\w,]+/g,'').trim();
+history.push({role:'assistant',content:raw});
+return{reply,emotionKey,exercises};
+}
+
+async function sendMessage(override){
+const text=override||inputEl.value.trim();
+if(!text||isTyping)return;
+showChat();inputEl.value='';inputEl.style.height='auto';
+isTyping=true;sendBtn.disabled=true;suggestionsEl.innerHTML='';
+addMessage(text,'user');showTyping();setThinking();
+try{
+const{reply,emotionKey,exercises}=await callClaude(text);
+removeTyping();setEmotion(emotionKey);addMessage(reply,'bot');
+if(exercises.length>0)insertExerciseCards(exercises);
+showSuggestions(history.length<=4
+?[{text:'Cuéntame más',isEx:false},{text:'Necesito calmarme',isEx:false}]
+:[{text:'Cuéntame más',isEx:false},{text:'Necesito calmarme',isEx:false},{text:'Muéstrame un ejercicio',isEx:true}]);
+}catch(err){removeTyping();setEmotion('calm');addMessage('Ups, hubo un problema de conexión. Intenta de nuevo 🙏','bot');}
+isTyping=false;sendBtn.disabled=false;inputEl.focus();
+}
+function startChat(text){sendMessage(text);}
+inputEl.addEventListener('input',()=>{inputEl.style.height='auto';inputEl.style.height=Math.min(inputEl.scrollHeight,96)+'px';});
+inputEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+
+/* ══ TABS ══ */
+function switchTab(tab){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(tab+'-screen').classList.add('active');document.getElementById('tab-'+tab).classList.add('active');if(tab==='mood'){renderCalendar();updateStreak();prefillTodayMood();}if(tab==='settings'){loadNotifSettings();}}
+
+/* ══ MOOD ══ */
+const MOOD_MAP={terrible:{emoji:'😭',color:'#4a6fa5',label:'Muy mal'},bad:{emoji:'😟',color:'#7b6fa5',label:'Mal'},okay:{emoji:'😐',color:'#7e7a94',label:'Regular'},good:{emoji:'😊',color:'#52b788',label:'Bien'},great:{emoji:'😄',color:'#f9c74f',label:'Genial'}};
+let moodData=JSON.parse(localStorage.getItem('serena_moods')||'{}'),selectedMood=null,calYear,calMonth;
+function todayKey(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function selectMood(btn){document.querySelectorAll('.mood-emoji-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedMood=btn.dataset.mood;}
+function saveMood(){if(!selectedMood){alert('Selecciona un emoji primero 🙏');return;}const key=todayKey();const note=document.getElementById('mood-note').value.trim();moodData[key]={mood:selectedMood,note,time:getTime()};localStorage.setItem('serena_moods',JSON.stringify(moodData));const fb=document.getElementById('save-feedback');fb.style.display='block';setTimeout(()=>fb.style.display='none',2000);renderCalendar();updateStreak();document.getElementById('mood-note').value='';document.querySelectorAll('.mood-emoji-btn').forEach(b=>b.classList.remove('selected'));selectedMood=null;}
+function updateStreak(){let streak=0,cursor=new Date();for(let i=0;i<365;i++){const k=`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`;if(moodData[k]){streak++;cursor.setDate(cursor.getDate()-1);}else if(i===0){cursor.setDate(cursor.getDate()-1);}else break;}document.getElementById('streak-count').textContent=streak+(streak===1?' día':' días');document.getElementById('profile-streak-num').textContent=streak;}
+function initCalendar(){const now=new Date();calYear=now.getFullYear();calMonth=now.getMonth();renderCalendar();}
+function changeMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function renderCalendar(){const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];document.getElementById('cal-month-label').textContent=`${months[calMonth]} ${calYear}`;const grid=document.getElementById('cal-grid');const today=new Date();const first=new Date(calYear,calMonth,1).getDay();const days=new Date(calYear,calMonth+1,0).getDate();grid.innerHTML='';for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-cell';grid.appendChild(e);}for(let d=1;d<=days;d++){const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const entry=moodData[key];const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;const cell=document.createElement('div');cell.className='cal-cell'+(isToday?' today':'')+(entry?' has-mood':'');if(entry){const m=MOOD_MAP[entry.mood];cell.style.background=m.color+'33';cell.innerHTML=`<span class="cal-cell-emoji">${m.emoji}</span><span class="cal-cell-num">${d}</span>`;cell.addEventListener('click',e=>showTooltip(e,entry));}else{cell.innerHTML=`<span style="font-size:10.5px;color:var(--text-muted)">${d}</span>`;}grid.appendChild(cell);}}
+function showTooltip(e,entry){const tip=document.getElementById('mood-tooltip');const m=MOOD_MAP[entry.mood];tip.innerHTML=`<div style="font-size:20px;margin-bottom:3px">${m.emoji}</div><strong>${m.label}</strong>${entry.note?`<br><span style="font-size:10.5px;color:var(--text-muted);margin-top:3px;display:block">${entry.note}</span>`:''}`;tip.style.display='block';const rect=e.target.getBoundingClientRect();tip.style.left=Math.min(rect.left,window.innerWidth-200)+'px';tip.style.top=(rect.top-8-80)+'px';setTimeout(()=>tip.style.display='none',2500);}
+document.addEventListener('click',e=>{if(!e.target.closest('.cal-cell'))document.getElementById('mood-tooltip').style.display='none';});
+function prefillTodayMood(){const entry=moodData[todayKey()];if(entry){document.querySelectorAll('.mood-emoji-btn').forEach(btn=>{if(btn.dataset.mood===entry.mood)btn.classList.add('selected');});selectedMood=entry.mood;if(entry.note)document.getElementById('mood-note').value=entry.note;}}
+
+/* ══ INIT ══ */
+function initApp(){
+applyProfile();
+initCalendar();
+updateStreak();
+loadNotifSettings();
+scheduleNotifications();
+setTimeout(()=>{
+if(history.length===0){
+const name=profile.name||'amig@';
+addMessage(`Hola ${name} 🌙\n\nTu mensaje de hoy:\n\n"${getDailyMessage()}"`, 'bot');
+showChat();
+showSuggestions([{text:'Gracias, lo necesitaba',isEx:false},{text:'Quiero hablar de algo',isEx:false},{text:'Muéstrame un ejercicio',isEx:true}]);
+}
+},800);
+}
+
+// Check if profile exists to skip onboarding
+if(localStorage.getItem('serena_profile')){
+profile=JSON.parse(localStorage.getItem('serena_profile'));
+document.getElementById('onboarding').classList.remove('show');
+initApp();
+}
+
+/* ══ VOICE — TTS (Serena habla) ══ */
+let currentUtterance = null;
+let voiceReady = false;
+
+// Desbloquear audio en móviles — requiere interacción del usuario
+function unlockAudio() {
+if (voiceReady || !('speechSynthesis' in window)) return;
+const u = new SpeechSynthesisUtterance('');
+u.volume = 0;
+window.speechSynthesis.speak(u);
+voiceReady = true;
+}
+document.addEventListener('click', unlockAudio, { once: true });
+document.addEventListener('touchstart', unlockAudio, { once: true });
+
+function getBestVoice() {
+const voices = window.speechSynthesis.getVoices();
+const tests = [
+v => v.lang === 'es-MX' && /paulina|female/i.test(v.name),
+v => v.lang === 'es-ES' && /mónica|helena|lucia|female/i.test(v.name),
+v => v.lang.startsWith('es') && v.localService,
+v => v.lang.startsWith('es'),
+];
+for (const fn of tests) { const f = voices.find(fn); if (f) return f; }
+return null;
+}
+
+function splitIntoChunks(text, maxLen) {
+const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+const chunks = []; let cur = '';
+for (const s of sentences) {
+if ((cur + s).length > maxLen && cur) { chunks.push(cur.trim()); cur = s; }
+else cur += s;
+}
+if (cur.trim()) chunks.push(cur.trim());
+return chunks;
+}
+
+function speakChunks(chunks, idx) {
+if (idx >= chunks.length) {
+document.getElementById('speaking-indicator').classList.remove('show');
+return;
+}
+const utter = new SpeechSynthesisUtterance(chunks[idx]);
+utter.lang = 'es-ES';
+utter.rate = 0.87;
+utter.pitch = 1.1;
+utter.volume = 1;
+const voice = getBestVoice();
+if (voice) utter.voice = voice;
+if (idx === 0) document.getElementById('speaking-indicator').classList.add('show');
+utter.onend = () => speakChunks(chunks, idx + 1);
+utter.onerror = () => document.getElementById('speaking-indicator').classList.remove('show');
+currentUtterance = utter;
+window.speechSynthesis.speak(utter);
+}
+
+function speakText(text) {
+if (!('speechSynthesis' in window)) return;
+if (!document.getElementById('voice-toggle').checked) return;
+window.speechSynthesis.cancel();
+const clean = text
+.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+.replace(/\*\*/g,'').replace(/\*/g,'').replace(/#{1,6}\s/g,'')
+.replace(/\n+/g,'. ').trim();
+if (!clean || clean.length < 2) return;
+speakChunks(splitIntoChunks(clean, 180), 0);
+}
+
+// Cargar voces disponibles
+if ('speechSynthesis' in window) {
+window.speechSynthesis.getVoices();
+if (typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+}
+
+/* ══ VOICE — STT (usuario habla) ══ */
+let recognition = null;
+let isRecording = false;
+
+function initRecognition() {
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) return null;
+const r = new SR();
+r.lang = 'es-ES';
+r.continuous = false;
+r.interimResults = true;
+
+r.onstart = () => {
+isRecording = true;
+document.getElementById('mic-btn').classList.add('recording');
+document.getElementById('mic-btn').textContent = '⏹';
+document.getElementById('user-input').placeholder = 'Escuchando…';
+};
+
+r.onresult = (e) => {
+const transcript = Array.from(e.results)
+.map(r => r[0].transcript).join('');
+document.getElementById('user-input').value = transcript;
+// Auto-resize
+const inp = document.getElementById('user-input');
+inp.style.height = 'auto';
+inp.style.height = Math.min(inp.scrollHeight, 96) + 'px';
+};
+
+r.onend = () => {
+isRecording = false;
+document.getElementById('mic-btn').classList.remove('recording');
+document.getElementById('mic-btn').textContent = '🎤';
+document.getElementById('user-input').placeholder = 'Escribe o habla…';
+// Auto-send if there's text
+const text = document.getElementById('user-input').value.trim();
+if (text) setTimeout(() => sendMessage(), 400);
+};
+
+r.onerror = (e) => {
+isRecording = false;
+document.getElementById('mic-btn').classList.remove('recording');
+document.getElementById('mic-btn').textContent = '🎤';
+document.getElementById('user-input').placeholder = 'Escribe o habla…';
+if (e.error === 'not-allowed') {
+alert('Permiso de micrófono denegado. Actívalo en la configuración del navegador.');
+}
+};
+
+return r;
+}
+
+function toggleMic() {
+// Stop speech if Serena is talking
+if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+document.getElementById('speaking-indicator').classList.remove('show');
+
+if (isRecording) {
+if (recognition) recognition.stop();
+return;
+}
+
+if (!recognition) recognition = initRecognition();
+if (!recognition) {
+alert('Tu navegador no soporta reconocimiento de voz. Prueba con Chrome.');
+return;
+}
+try { recognition.start(); } catch(e) {}
+}
+
+/* ══ PATCH sendMessage to speak response ══ */
+const _origCallClaude = callClaude;
+// Intercept addMessage to speak bot replies
+const _origAddMessage = addMessage;
+window._voicePatchActive = true;
+</script>
+
+</body>
+</html>
