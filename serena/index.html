@@ -756,7 +756,7 @@ function showSuggestions(list){suggestionsEl.innerHTML='';list.forEach(({text,is
 
 async function callClaude(msg){
 history.push({role:'user',content:msg});
-const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:history})});
+const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:history})});
 const data=await res.json();
 let raw=data.content?.[0]?.text||'Lo siento, algo salió mal.';
 const em=raw.match(/EMOTION:(\w+)/);
