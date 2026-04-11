@@ -707,7 +707,7 @@ if (btn) { btn.textContent = '⏳ Cargando…'; btn.disabled = true; }
 document.getElementById('speaking-indicator').classList.add('show');
 try {
 const response = await fetch(
-'/.netlify/functions/tts',
+'/api/tts',
 {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
