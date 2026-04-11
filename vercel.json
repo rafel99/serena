@@ -1,3 +1,8 @@
 {
-  "outputDirectory": "serena"
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat" },
+    { "source": "/api/tts", "destination": "/api/tts" },
+    { "source": "/(.*)", "destination": "/serena/$1" }
+  ]
 }
