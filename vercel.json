@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/chat", "destination": "/api/chat.js" },
-    { "source": "/api/tts",  "destination": "/api/tts.js"  },
-    { "source": "/(.*)",     "destination": "/serena/$1"   }
+  "buildCommand": null,
+  "outputDirectory": "serena",
+  "routes": [
+    { "src": "/api/chat", "dest": "/api/chat.js" },
+    { "src": "/api/tts",  "dest": "/api/tts.js"  },
+    { "src": "/(.*)",     "dest": "/serena/$1"    }
   ]
 }
