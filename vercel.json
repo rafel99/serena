@@ -1,10 +1,4 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "outputDirectory": "serena",
-  "routes": [
-    { "src": "/api/chat", "dest": "/api/chat.js" },
-    { "src": "/api/tts",  "dest": "/api/tts.js"  },
-    { "src": "/(.*)",     "dest": "/serena/$1"    }
-  ]
+  "outputDirectory": "serena"
 }
