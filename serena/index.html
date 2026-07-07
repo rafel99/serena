@@ -677,6 +677,7 @@ const sendBtn=document.getElementById('send-btn');
 function getTime(){return new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});}
 function showChat(){welcomeEl.style.display='none';messagesEl.style.display='flex';suggestionsEl.style.display='flex';}
 let msgCounter=0;
+
 const XI_VOICE_ID = 'imFXYz8XIletRKLZZQaA';
 let currentAudio = null;
 
@@ -690,51 +691,12 @@ return text
 .trim();
 }
 
-// Fallback: Web Speech API (gratuita, nativa del navegador)
-function playWithWebSpeech(text, btn) {
-if (!('speechSynthesis' in window)) {
-if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
-document.getElementById('speaking-indicator').classList.remove('show');
-return;
-}
-window.speechSynthesis.cancel();
-const chunks = splitIntoChunks(text, 180);
-let idx = 0;
-const speakNext = () => {
-if (idx >= chunks.length) {
-if (btn) btn.textContent = '▶ Escuchar';
-document.getElementById('speaking-indicator').classList.remove('show');
-return;
-}
-const utter = new SpeechSynthesisUtterance(chunks[idx++]);
-utter.lang = 'es-ES';
-utter.rate = 0.87;
-utter.pitch = 1.1;
-const voice = getBestVoice();
-if (voice) utter.voice = voice;
-utter.onend = speakNext;
-utter.onerror = () => {
-if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
-document.getElementById('speaking-indicator').classList.remove('show');
-};
-window.speechSynthesis.speak(utter);
-};
-if (btn) { btn.textContent = '⏹ Detener'; btn.disabled = false; }
-speakNext();
-}
-
 async function playMsg(id, text) {
 const btn = document.getElementById(id);
-// Si hay audio reproduciéndose, detenerlo
+// If audio is playing, stop it
 if (currentAudio && !currentAudio.paused) {
 currentAudio.pause();
 currentAudio = null;
-if (btn) btn.textContent = '▶ Escuchar';
-document.getElementById('speaking-indicator').classList.remove('show');
-return;
-}
-if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-window.speechSynthesis.cancel();
 if (btn) btn.textContent = '▶ Escuchar';
 document.getElementById('speaking-indicator').classList.remove('show');
 return;
@@ -744,19 +706,15 @@ if (!clean) return;
 if (btn) { btn.textContent = '⏳ Cargando…'; btn.disabled = true; }
 document.getElementById('speaking-indicator').classList.add('show');
 try {
-const response = await fetch('/api/tts', {
+const response = await fetch(
+'/api/tts',
+{
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ text: clean, voice_id: XI_VOICE_ID })
-});
-// Si ElevenLabs falla (402 sin créditos, 401 key inválida, etc.)
-// usamos Web Speech API como fallback automático
-if (!response.ok) {
-const errData = await response.json().catch(() => ({}));
-console.warn('ElevenLabs no disponible:', errData.error || response.status, '— usando voz del navegador');
-playWithWebSpeech(clean, btn);
-return;
 }
+);
+if (!response.ok) throw new Error('ElevenLabs error ' + response.status);
 const blob = await response.blob();
 const url = URL.createObjectURL(blob);
 const audio = new Audio(url);
@@ -775,8 +733,9 @@ currentAudio = null;
 };
 audio.play();
 } catch(err) {
-console.warn('TTS fetch falló, usando voz del navegador:', err);
-playWithWebSpeech(clean, btn);
+console.error('TTS error:', err);
+if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
+document.getElementById('speaking-indicator').classList.remove('show');
 }
 }
 function addMessage(text,role){
@@ -797,7 +756,7 @@ function showSuggestions(list){suggestionsEl.innerHTML='';list.forEach(({text,is
 
 async function callClaude(msg){
 history.push({role:'user',content:msg});
-const res=await fetch('/api/chat.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM_PROMPT,messages:history})});
+const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM_PROMPT,messages:history})});
 const data=await res.json();
 let raw=data.content?.[0]?.text||'Lo siento, algo salió mal.';
 const em=raw.match(/EMOTION:(\w+)/);
