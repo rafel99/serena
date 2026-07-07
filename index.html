@@ -689,12 +689,50 @@ return text
 .trim();
 }
 
+function playWithBrowserVoice(text, btn) {
+if (!('speechSynthesis' in window)) {
+if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
+document.getElementById('speaking-indicator').classList.remove('show');
+return;
+}
+window.speechSynthesis.cancel();
+const chunks = splitIntoChunks(text, 180);
+let idx = 0;
+const speakNext = () => {
+if (idx >= chunks.length) {
+if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
+document.getElementById('speaking-indicator').classList.remove('show');
+return;
+}
+const utter = new SpeechSynthesisUtterance(chunks[idx++]);
+utter.lang = 'es-ES';
+utter.rate = 0.9;
+utter.pitch = 1.05;
+const voice = getBestVoice();
+if (voice) utter.voice = voice;
+utter.onend = speakNext;
+utter.onerror = () => {
+if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
+document.getElementById('speaking-indicator').classList.remove('show');
+};
+window.speechSynthesis.speak(utter);
+};
+if (btn) { btn.textContent = '⏹ Detener'; btn.disabled = false; }
+speakNext();
+}
+
 async function playMsg(id, text) {
 const btn = document.getElementById(id);
-// If audio is playing, stop it
+// Si hay audio o voz reproduciéndose, detener
 if (currentAudio && !currentAudio.paused) {
 currentAudio.pause();
 currentAudio = null;
+if (btn) btn.textContent = '▶ Escuchar';
+document.getElementById('speaking-indicator').classList.remove('show');
+return;
+}
+if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+window.speechSynthesis.cancel();
 if (btn) btn.textContent = '▶ Escuchar';
 document.getElementById('speaking-indicator').classList.remove('show');
 return;
@@ -712,7 +750,12 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ text: clean, voice_id: XI_VOICE_ID })
 }
 );
-if (!response.ok) throw new Error('ElevenLabs error ' + response.status);
+// Si ElevenLabs falla (402 sin créditos, 401, etc.) usamos la voz del navegador
+if (!response.ok) {
+console.warn('ElevenLabs no disponible (' + response.status + ') — usando voz del navegador');
+playWithBrowserVoice(clean, btn);
+return;
+}
 const blob = await response.blob();
 const url = URL.createObjectURL(blob);
 const audio = new Audio(url);
@@ -731,9 +774,8 @@ currentAudio = null;
 };
 audio.play();
 } catch(err) {
-console.error('TTS error:', err);
-if (btn) { btn.textContent = '▶ Escuchar'; btn.disabled = false; }
-document.getElementById('speaking-indicator').classList.remove('show');
+console.warn('TTS fetch falló — usando voz del navegador:', err);
+playWithBrowserVoice(clean, btn);
 }
 }
 function addMessage(text,role){
