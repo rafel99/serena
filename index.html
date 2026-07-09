@@ -783,7 +783,7 @@ const msg=document.createElement('div');
 msg.className=`msg ${role}`;
 if(role==='bot'){
 const id='msg-'+(++msgCounter);
-const safe=text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+const safe=text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,' ');
 msg.innerHTML=`<div class="bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-footer"><span class="msg-time">${getTime()}</span><button class="play-btn" id="${id}" onclick="playMsg('${id}','${safe}')">▶ Escuchar</button></div>`;
 }else{
 msg.innerHTML=`<div class="bubble">${text.replace(/\n/g,'<br>')}</div><span class="msg-time">${getTime()}</span>`;
