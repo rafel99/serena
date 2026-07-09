@@ -33,24 +33,24 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// ── NOTIFICATION MESSAGES ──
+// â”€â”€ NOTIFICATION MESSAGES â”€â”€
 const MORNING_MSGS = [
-  { title: 'Buenos días 🌅', body: 'Un nuevo día, una nueva oportunidad. ¿Cómo amaneciste hoy?' },
-  { title: 'Serena te saluda 🌙', body: 'Antes de empezar el día, respira. Estoy aquí si me necesitas.' },
-  { title: 'Empieza bien el día ✨', body: 'Registra cómo te sientes esta mañana. Un minuto puede marcar la diferencia.' },
-  { title: '¡Hola! 🌸', body: 'Tu mensaje de hoy está listo. Tómate un momento para ti.' },
+  { title: 'Buenos dÃ­as ðŸŒ…', body: 'Un nuevo dÃ­a, una nueva oportunidad. Â¿CÃ³mo amaneciste hoy?' },
+  { title: 'Serena te saluda ðŸŒ™', body: 'Antes de empezar el dÃ­a, respira. Estoy aquÃ­ si me necesitas.' },
+  { title: 'Empieza bien el dÃ­a âœ¨', body: 'Registra cÃ³mo te sientes esta maÃ±ana. Un minuto puede marcar la diferencia.' },
+  { title: 'Â¡Hola! ðŸŒ¸', body: 'Tu mensaje de hoy estÃ¡ listo. TÃ³mate un momento para ti.' },
 ];
 const MIDDAY_MSGS = [
-  { title: 'Check-in del mediodía 🌤️', body: '¿Cómo vas? A veces un momento de pausa lo cambia todo.' },
-  { title: 'Pausa de bienestar ☀️', body: 'Respira profundo. ¿Necesitas desahogarte o calmarte un momento?' },
-  { title: 'A mitad del día 💬', body: '¿Cómo está tu energía? Cuéntame, estoy aquí.' },
-  { title: 'Un momento para ti 🌿', body: 'El día puede ser intenso. ¿Qué tal un ejercicio rápido de 2 minutos?' },
+  { title: 'Check-in del mediodÃ­a ðŸŒ¤ï¸', body: 'Â¿CÃ³mo vas? A veces un momento de pausa lo cambia todo.' },
+  { title: 'Pausa de bienestar â˜€ï¸', body: 'Respira profundo. Â¿Necesitas desahogarte o calmarte un momento?' },
+  { title: 'A mitad del dÃ­a ðŸ’¬', body: 'Â¿CÃ³mo estÃ¡ tu energÃ­a? CuÃ©ntame, estoy aquÃ­.' },
+  { title: 'Un momento para ti ðŸŒ¿', body: 'El dÃ­a puede ser intenso. Â¿QuÃ© tal un ejercicio rÃ¡pido de 2 minutos?' },
 ];
 const NIGHT_MSGS = [
-  { title: 'Reflexión nocturna 🌙', body: '¿Cómo fue tu día? Escríbelo o simplemente desahógate.' },
-  { title: 'Antes de dormir 🌟', body: 'Registra tu estado de ánimo de hoy. Mañana lo verás en tu calendario.' },
-  { title: 'Buenas noches ✨', body: 'El día terminó. ¿Qué quieres soltar antes de descansar?' },
-  { title: 'Tu espacio seguro 💜', body: 'Estoy aquí para escucharte antes de que cierres los ojos.' },
+  { title: 'ReflexiÃ³n nocturna ðŸŒ™', body: 'Â¿CÃ³mo fue tu dÃ­a? EscrÃ­belo o simplemente desahÃ³gate.' },
+  { title: 'Antes de dormir ðŸŒŸ', body: 'Registra tu estado de Ã¡nimo de hoy. MaÃ±ana lo verÃ¡s en tu calendario.' },
+  { title: 'Buenas noches âœ¨', body: 'El dÃ­a terminÃ³. Â¿QuÃ© quieres soltar antes de descansar?' },
+  { title: 'Tu espacio seguro ðŸ’œ', body: 'Estoy aquÃ­ para escucharte antes de que cierres los ojos.' },
 ];
 
 function getRandom(arr) {
@@ -86,7 +86,7 @@ async function showNotification(slot) {
     vibrate: [200, 100, 200],
     data: { url: './' },
     actions: [
-      { action: 'open', title: '💬 Abrir Serena' },
+      { action: 'open', title: 'ðŸ’¬ Abrir Serena' },
       { action: 'dismiss', title: 'Ahora no' }
     ]
   });
