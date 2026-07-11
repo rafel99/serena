@@ -60,12 +60,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
 /* ── ORB ── */
 #orb-header{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 20px 10px;border-bottom:1px solid var(--border);background:rgba(15,14,23,0.85);backdrop-filter:blur(16px)}
-#orb-wrap{position:relative;width:72px;height:72px;margin-bottom:7px;animation:foxWalkIn 1.7s ease-out}
-@keyframes foxWalkIn{0%{transform:translateX(160px);opacity:0}8%{opacity:1}22%{transform:translateX(112px) translateY(-5px)}36%{transform:translateX(76px) translateY(0)}50%{transform:translateX(46px) translateY(-5px)}64%{transform:translateX(24px) translateY(0)}78%{transform:translateX(9px) translateY(-3px)}90%{transform:translateX(2px) translateY(0)}100%{transform:translateX(0) translateY(0)}}
+#orb-wrap{position:relative;width:72px;height:72px;margin-bottom:7px;animation:orbFloat 5.5s ease-in-out infinite}
+@keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+#orb-orbit{position:absolute;left:50%;top:56%;width:98px;height:34px;transform:translate(-50%,-50%) rotate(-16deg);border-radius:50%;border:1.5px solid transparent;border-bottom-color:rgba(255,240,214,0.6);border-left-color:rgba(255,240,214,0.25);pointer-events:none;z-index:4;animation:orbitShine 6s ease-in-out infinite}
+@keyframes orbitShine{0%,100%{opacity:0.5}50%{opacity:1}}
+.sparkle{position:absolute;pointer-events:none;z-index:5;color:#ffe9b8;font-size:8px;text-shadow:0 0 6px rgba(255,233,184,0.8);animation:twinkle 3.6s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(0.4) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(20deg)}}
 #orb-ring{position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(var(--orb-a),var(--orb-b),var(--orb-a));filter:blur(8px);opacity:0.45;animation:spin 6s linear infinite;transition:background 1.2s}
 @keyframes spin{to{transform:rotate(360deg)}}
-#orb{position:absolute;inset:0;border-radius:50%;background:#fdf3e7;box-shadow:0 0 22px var(--orb-glow),inset 0 0 12px rgba(255,255,255,0.08);transition:box-shadow 1.2s;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:breathe 4s ease-in-out infinite}
-#orb-fox{width:100%;height:100%;object-fit:cover;border-radius:50%;transition:opacity 0.35s}
+#orb{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(255,246,220,0.95) 0%,var(--orb-b) 40%,var(--orb-a) 100%);box-shadow:0 0 22px var(--orb-glow),inset 0 0 12px rgba(255,255,255,0.08);transition:background 1.2s,box-shadow 1.2s;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:breathe 4s ease-in-out infinite}
 #orb::after{content:'';position:absolute;top:10%;left:18%;width:30%;height:20%;border-radius:50%;background:rgba(255,255,255,0.18);filter:blur(3px);transform:rotate(-30deg)}
 #orb-face{width:42px;height:42px;position:relative;z-index:2}
 .orb-ripple{animation:ripple 0.6s ease-out !important}
@@ -284,9 +287,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div id="orb-header">
 <div id="orb-wrap">
 <div id="orb-ring"></div>
+<div id="orb-orbit"></div>
 <div id="orb">
-<img id="orb-fox" src="./fox-calm.png" alt="Serena">
+<svg id="orb-face" viewBox="0 0 52 52" fill="none">
+<ellipse id="eye-l" cx="18" cy="22" rx="3" ry="3.5" fill="rgba(255,255,255,0.9)"/>
+<ellipse id="eye-r" cx="34" cy="22" rx="3" ry="3.5" fill="rgba(255,255,255,0.9)"/>
+<circle id="pupil-l" cx="18" cy="23" r="1.5" fill="rgba(0,0,0,0.45)"/>
+<circle id="pupil-r" cx="34" cy="23" r="1.5" fill="rgba(0,0,0,0.45)"/>
+<path id="mouth" d="M 19 33 Q 26 38 33 33" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
+<ellipse id="blush-l" cx="12" cy="30" rx="5" ry="3" fill="rgba(255,180,180,0)"/>
+<ellipse id="blush-r" cx="40" cy="30" rx="5" ry="3" fill="rgba(255,180,180,0)"/>
+</svg>
 </div>
+<span class="sparkle" style="top:-7px;right:-7px">✦</span>
+<span class="sparkle" style="bottom:6px;left:-13px;animation-delay:1.3s;font-size:6px">✦</span>
+<span class="sparkle" style="top:14px;left:-17px;animation-delay:2.4s;font-size:5px">✦</span>
 </div>
 <div id="emotion-label">Tranquila</div>
 <div class="orb-name">Serena</div>
@@ -633,13 +648,12 @@ function insertExerciseCards(types){const wrap=document.createElement('div');wra
 
 /* ══ ORB ══ */
 const EMOTIONS={calm:{label:'Tranquila',a:'#9b7fd4',b:'#c8a97e',glow:'rgba(155,127,212,0.35)',mouth:'M 19 33 Q 26 38 33 33',eyeRy:3.5,eyeCy:22,blush:0},happy:{label:'Feliz',a:'#f9c74f',b:'#f4845f',glow:'rgba(249,199,79,0.4)',mouth:'M 17 32 Q 26 40 35 32',eyeRy:2.5,eyeCy:21,blush:0.18},sad:{label:'Acompañándote',a:'#4a6fa5',b:'#7b8fb7',glow:'rgba(74,111,165,0.35)',mouth:'M 19 36 Q 26 31 33 36',eyeRy:3.8,eyeCy:23,blush:0},anxious:{label:'Presente',a:'#e07a5f',b:'#c17b5c',glow:'rgba(224,122,95,0.35)',mouth:'M 20 34 Q 26 34 32 34',eyeRy:4.2,eyeCy:22,blush:0},angry:{label:'Escuchando',a:'#c1121f',b:'#e63946',glow:'rgba(193,18,31,0.3)',mouth:'M 19 36 Q 26 31 33 36',eyeRy:2.8,eyeCy:22,blush:0},surprised:{label:'Atenta',a:'#48cae4',b:'#90e0ef',glow:'rgba(72,202,228,0.35)',mouth:'M 21 33 Q 26 36 31 33',eyeRy:4.5,eyeCy:21,blush:0},grateful:{label:'Feliz por ti',a:'#52b788',b:'#74c69d',glow:'rgba(82,183,136,0.35)',mouth:'M 17 32 Q 26 40 35 32',eyeRy:2.5,eyeCy:21,blush:0.22}};
-const FOX_IMGS={calm:'./fox-calm.png',happy:'./fox-happy.png',grateful:'./fox-happy.png',sad:'./fox-sad.png',anxious:'./fox-alert.png',angry:'./fox-alert.png',surprised:'./fox-alert.png'};
-Object.values(FOX_IMGS).forEach(src=>{const i=new Image();i.src=src;});
-// Saludo de entrada: al terminar de caminar, sonríe y vuelve a la calma
-window.addEventListener('load',()=>{setTimeout(()=>{setFoxImage(FOX_IMGS.happy);setTimeout(()=>setFoxImage(FOX_IMGS.calm),1400);},1700);});
-function setFoxImage(src){const fox=document.getElementById('orb-fox');if(!fox||fox.getAttribute('src')===src)return;fox.style.opacity='0';setTimeout(()=>{fox.setAttribute('src',src);fox.style.opacity='1';},180);}
-function setEmotion(key){const e=EMOTIONS[key]||EMOTIONS.calm;document.documentElement.style.setProperty('--orb-a',e.a);document.documentElement.style.setProperty('--orb-b',e.b);document.documentElement.style.setProperty('--orb-glow',e.glow);const orb=document.getElementById('orb');orb.style.boxShadow=`0 0 26px ${e.glow}, inset 0 0 12px rgba(255,255,255,0.08)`;setFoxImage(FOX_IMGS[key]||FOX_IMGS.calm);document.getElementById('emotion-label').textContent=e.label;orb.classList.remove('orb-ripple');void orb.offsetWidth;orb.classList.add('orb-ripple');setTimeout(()=>orb.classList.remove('orb-ripple'),700);}
-function setThinking(){const orb=document.getElementById('orb');orb.style.boxShadow='0 0 22px rgba(120,120,140,0.35)';setFoxImage(FOX_IMGS.calm);document.getElementById('emotion-label').textContent='Pensando…';}
+function setEmotion(key){const e=EMOTIONS[key]||EMOTIONS.calm;document.documentElement.style.setProperty('--orb-a',e.a);document.documentElement.style.setProperty('--orb-b',e.b);document.documentElement.style.setProperty('--orb-glow',e.glow);const orb=document.getElementById('orb');orb.style.background=`radial-gradient(circle at 35% 28%, rgba(255,246,220,0.95) 0%, ${e.b} 40%, ${e.a} 100%)`;orb.style.boxShadow=`0 0 22px ${e.glow}, inset 0 0 12px rgba(255,255,255,0.08)`;document.getElementById('mouth').setAttribute('d',e.mouth);['eye-l','eye-r'].forEach(id=>{document.getElementById(id).setAttribute('ry',e.eyeRy);document.getElementById(id).setAttribute('cy',e.eyeCy);});document.getElementById('pupil-l').setAttribute('cy',e.eyeCy+1);document.getElementById('pupil-r').setAttribute('cy',e.eyeCy+1);document.getElementById('blush-l').setAttribute('fill',`rgba(255,180,180,${e.blush})`);document.getElementById('blush-r').setAttribute('fill',`rgba(255,180,180,${e.blush})`);document.getElementById('emotion-label').textContent=e.label;orb.classList.remove('orb-ripple');void orb.offsetWidth;orb.classList.add('orb-ripple');setTimeout(()=>orb.classList.remove('orb-ripple'),700);}
+function setThinking(){const orb=document.getElementById('orb');orb.style.background='radial-gradient(circle at 38% 35%, #555, #333 80%)';orb.style.boxShadow='0 0 22px rgba(100,100,100,0.3)';document.getElementById('emotion-label').textContent='Pensando…';['eye-l','eye-r'].forEach(id=>document.getElementById(id).setAttribute('ry',1.4));document.getElementById('mouth').setAttribute('d','M 20 34 Q 26 34 32 34');}
+
+/* ══ Vida del orbe: parpadeo y mirada ══ */
+setInterval(()=>{const l=document.getElementById('eye-l'),r=document.getElementById('eye-r');if(!l)return;const ry=l.getAttribute('ry');if(parseFloat(ry)<1.6)return;l.setAttribute('ry',0.5);r.setAttribute('ry',0.5);setTimeout(()=>{l.setAttribute('ry',ry);r.setAttribute('ry',ry);},130);},4200);
+setInterval(()=>{const pl=document.getElementById('pupil-l'),pr=document.getElementById('pupil-r');if(!pl)return;const dx=(Math.random()<0.5?-1:1)*1.3;pl.setAttribute('cx',18+dx);pr.setAttribute('cx',34+dx);setTimeout(()=>{pl.setAttribute('cx',18);pr.setAttribute('cx',34);},900);},7000);
 
 /* ══ CHAT ══ */
 const SYSTEM_PROMPT=`Eres Serena, una asistente de apoyo emocional cálida, empática y presente. El nombre del usuario es ${profile.name||'amig@'}.
