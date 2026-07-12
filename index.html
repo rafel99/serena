@@ -213,6 +213,26 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .course-modal-body{font-size:13px;color:var(--text-muted);line-height:1.75;text-align:left}
 .course-modal-focus{font-size:11px;color:#B78EFF;letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px;text-align:left}
 
+/* ══ MICRO-ESCENAS ANIMADAS ══ */
+.motiv-scene-btn{background:linear-gradient(135deg,rgba(183,142,255,0.12),rgba(229,192,123,0.1));border:1px solid rgba(183,142,255,0.25);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:9px 16px;border-radius:20px;cursor:pointer;transition:all .25s ease}
+.motiv-scene-btn:hover{border-color:#B78EFF;transform:translateY(-1px);box-shadow:0 8px 18px -8px rgba(183,142,255,0.4)}
+
+.motiv-scene{width:100%;max-width:250px;margin:0 auto 6px;filter:drop-shadow(0 6px 18px rgba(183,142,255,0.15))}
+@keyframes sceneSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes sceneBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes scenePulseSoft{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.08);opacity:1}}
+@keyframes sceneFloatUp{0%{transform:translateY(0);opacity:0}20%{opacity:.8}100%{transform:translateY(-22px);opacity:0}}
+@keyframes sceneRay{0%,100%{opacity:.25}50%{opacity:.7}}
+.ms-star{animation:twinkle 3.2s ease-in-out infinite}
+.ms-moon{animation:sceneBob 5s ease-in-out infinite;transform-origin:center}
+.ms-sun{animation:scenePulseSoft 4.5s ease-in-out infinite;transform-origin:center}
+.ms-ray{animation:sceneRay 3s ease-in-out infinite}
+.ms-sprout{animation:sceneSway 4s ease-in-out infinite;transform-origin:bottom center}
+.ms-sprout2{animation:sceneSway 4.3s ease-in-out infinite .3s;transform-origin:bottom center}
+.ms-wave{animation:sceneBob 4.4s ease-in-out infinite}
+.ms-heart{animation:scenePulseSoft 2.6s ease-in-out infinite;transform-origin:center}
+.ms-particle{animation:sceneFloatUp 3.6s ease-in-out infinite}
+
 /* ══ CURSO LIBRARY ══ */
 .course-lib-header{padding:24px 18px 6px}
 .course-lib-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:500}
@@ -423,6 +443,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div class="mood-section-title">¿Cómo estás hoy?</div>
 <div class="mood-section-sub">Registra tu estado de ánimo</div>
 <div id="mood-picker">
+<button class="motiv-scene-btn" onclick="openExercise('motivation')">🌅 Ver un momento de calma</button>
 <div class="mood-picker-label">Toca el emoji que mejor te describe</div>
 <div class="mood-emojis">
 <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="mood-emoji-btn" data-mood="terrible" onclick="selectMood(this)">😭</button><span class="mood-emoji-label">Muy mal</span></div>
@@ -1082,7 +1103,15 @@ function nextAffirmation(){affirmIdx++;showAffirmation();}
 function startPMR(){pmrIndex=0;pmrPhase='tense';renderPMR();}
 function renderPMR(){if(pmrIndex>=PMR_STEPS.length){setModal({icon:'😌',title:'Relajación completa',stepLabel:'Ejercicio completado',body:`<p style="font-size:13.5px;color:var(--text-muted);line-height:1.7">Tu cuerpo ha liberado la tensión acumulada.</p>`,actions:`<button class="modal-btn" onclick="closeExercise()">Volver al chat</button>`});return;}const step=PMR_STEPS[pmrIndex];const isTense=pmrPhase==='tense';setModal({icon:step.emoji,title:'Relajación muscular',stepLabel:`${step.muscle} — ${isTense?'Tensión':'Liberación'}`,body:`<p style="font-size:13.5px;color:var(--text-muted);line-height:1.7">${isTense?step.action:step.release}</p>`,showProgress:true,progress:(pmrIndex/PMR_STEPS.length)*100,actions:`<button class="modal-btn" onclick="advancePMR()">${isTense?'Soltar ahora':'Continuar →'}</button>`});if(isTense){exerciseTimer=setTimeout(()=>{pmrPhase='release';renderPMR();},7000);}}
 function advancePMR(){clearInterval(exerciseTimer);if(pmrPhase==='tense'){pmrPhase='release';}else{pmrPhase='tense';pmrIndex++;}renderPMR();}
-function showMotivation(){setModal({icon:'🌅',title:'Mensaje del día',body:`<div id="affirmation-text" style="font-size:15.5px">"${getDailyMessage()}"</div>`,actions:`<button class="modal-btn" onclick="closeExercise()">Llevar esto conmigo</button>`});}
+const MOTIV_SCENES=[
+`<svg class="motiv-scene" viewBox="0 0 260 140"><circle class="ms-star" cx="28" cy="26" r="1.6" fill="#fff" opacity="0.9"/><circle class="ms-star" cx="200" cy="20" r="1.3" fill="#fff" style="animation-delay:.6s"/><circle class="ms-star" cx="225" cy="55" r="1.8" fill="#fff" style="animation-delay:1.2s"/><circle class="ms-star" cx="55" cy="70" r="1.2" fill="#fff" style="animation-delay:1.8s"/><circle class="ms-star" cx="170" cy="95" r="1.5" fill="#fff" style="animation-delay:.9s"/><circle class="ms-moon" cx="130" cy="68" r="30" fill="#E5C07B" opacity="0.95"/><circle cx="120" cy="58" r="26" fill="#0f0e17" opacity="0.35"/></svg>`,
+`<svg class="motiv-scene" viewBox="0 0 260 140"><g class="ms-ray" stroke="#E3A876" stroke-width="2" stroke-linecap="round" opacity="0.4"><line x1="130" y1="30" x2="130" y2="10"/><line x1="100" y1="38" x2="86" y2="22"/><line x1="160" y1="38" x2="174" y2="22"/><line x1="82" y1="60" x2="60" y2="55"/><line x1="178" y1="60" x2="200" y2="55"/></g><circle class="ms-sun" cx="130" cy="70" r="32" fill="#E3A876"/><path d="M0,120 Q65,90 130,112 T260,105 V140 H0 Z" fill="#1a1828"/><path d="M0,132 Q80,110 160,128 T260,120 V140 H0 Z" fill="#0f0e17"/></svg>`,
+`<svg class="motiv-scene" viewBox="0 0 260 140"><ellipse cx="130" cy="126" rx="60" ry="8" fill="#221f35"/><path class="ms-sprout" d="M130,126 C130,90 130,70 130,55" stroke="#7ba876" stroke-width="4" fill="none" stroke-linecap="round"/><path class="ms-sprout" d="M130,80 C112,74 100,58 98,42" stroke="#8fbf8a" stroke-width="4" fill="none" stroke-linecap="round"/><path class="ms-sprout2" d="M130,95 C148,89 160,73 162,57" stroke="#8fbf8a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="130" cy="50" r="7" fill="#E5C07B" opacity="0.85"/></svg>`,
+`<svg class="motiv-scene" viewBox="0 0 260 140"><path class="ms-wave" d="M0,60 Q40,40 80,60 T160,60 T260,60" stroke="#B78EFF" stroke-width="3" fill="none" opacity="0.55"/><path class="ms-wave" d="M0,85 Q40,68 80,85 T160,85 T260,85" stroke="#8fa9d6" stroke-width="3" fill="none" opacity="0.5" style="animation-delay:.5s"/><path class="ms-wave" d="M0,108 Q40,94 80,108 T160,108 T260,108" stroke="#E5C07B" stroke-width="2.5" fill="none" opacity="0.4" style="animation-delay:1s"/></svg>`,
+`<svg class="motiv-scene" viewBox="0 0 260 140"><circle class="ms-particle" cx="90" cy="90" r="2.5" fill="#E5C07B" style="animation-delay:0s"/><circle class="ms-particle" cx="170" cy="95" r="2" fill="#B78EFF" style="animation-delay:1s"/><circle class="ms-particle" cx="130" cy="100" r="2.2" fill="#fff" style="animation-delay:2s"/><path class="ms-heart" d="M130,95 C104,70 78,72 78,50 C78,32 96,26 110,38 C118,45 124,52 130,60 C136,52 142,45 150,38 C164,26 182,32 182,50 C182,72 156,70 130,95 Z" fill="#B78EFF" opacity="0.85"/></svg>`
+];
+
+function showMotivation(){const scene=MOTIV_SCENES[Math.floor(Math.random()*MOTIV_SCENES.length)];setModal({icon:'',title:'Mensaje del día',body:`${scene}<div id="affirmation-text" style="font-size:15.5px">"${getDailyMessage()}"</div>`,actions:`<button class="modal-btn" onclick="closeExercise()">Llevar esto conmigo</button>`});}
 function insertExerciseCards(types){const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;gap:7px;align-self:flex-start;max-width:280px;animation:fadeUp 0.3s ease forwards;opacity:0';types.forEach(type=>{const info={breath:{icon:'🌬️',title:'Respiración guiada',desc:'Técnica 4-4-4 para calmar el sistema nervioso.'},ground:{icon:'🌿',title:'Grounding 5-4-3-2-1',desc:'Vuelve al presente usando tus 5 sentidos.'},affirm:{icon:'💫',title:'Afirmaciones',desc:'Frases poderosas para reconectar contigo.'},pmr:{icon:'😌',title:'Relajación muscular',desc:'Libera la tensión física paso a paso.'},motivation:{icon:'🌅',title:'Mensaje del día',desc:'Una frase inspiradora para acompañarte.'}}[type];if(!info)return;const card=document.createElement('div');card.className='exercise-card';card.innerHTML=`<div class="exercise-card-title">${info.icon} ${info.title}</div><div class="exercise-card-desc">${info.desc}</div><button class="exercise-start-btn" onclick="openExercise('${type}')">Comenzar</button>`;wrap.appendChild(card);});messagesEl.appendChild(wrap);messagesEl.scrollTop=messagesEl.scrollHeight;}
 
 const EMOTIONS={calm:{label:'Tranquila',a:'#9b7fd4',b:'#c8a97e',glow:'rgba(155,127,212,0.35)',mouth:'M 19 33 Q 26 38 33 33',eyeRy:3.5,eyeCy:22,blush:0},happy:{label:'Feliz',a:'#f9c74f',b:'#f4845f',glow:'rgba(249,199,79,0.4)',mouth:'M 17 32 Q 26 40 35 32',eyeRy:2.5,eyeCy:21,blush:0.18},sad:{label:'Acompañándote',a:'#4a6fa5',b:'#7b8fb7',glow:'rgba(74,111,165,0.35)',mouth:'M 19 36 Q 26 31 33 36',eyeRy:3.8,eyeCy:23,blush:0},anxious:{label:'Presente',a:'#e07a5f',b:'#c17b5c',glow:'rgba(224,122,95,0.35)',mouth:'M 20 34 Q 26 34 32 34',eyeRy:4.2,eyeCy:22,blush:0},angry:{label:'Escuchando',a:'#c1121f',b:'#e63946',glow:'rgba(193,18,31,0.3)',mouth:'M 19 36 Q 26 31 33 36',eyeRy:2.8,eyeCy:22,blush:0},surprised:{label:'Atenta',a:'#48cae4',b:'#90e0ef',glow:'rgba(72,202,228,0.35)',mouth:'M 21 33 Q 26 36 31 33',eyeRy:4.5,eyeCy:21,blush:0},grateful:{label:'Feliz por ti',a:'#52b788',b:'#74c69d',glow:'rgba(82,183,136,0.35)',mouth:'M 17 32 Q 26 40 35 32',eyeRy:2.5,eyeCy:21,blush:0.22}};
