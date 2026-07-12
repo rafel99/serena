@@ -184,6 +184,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .legend-item{display:flex;align-items:center;gap:3px;font-size:10.5px;color:var(--text-muted)}
 #mood-tooltip{display:none;position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:9px 12px;font-size:12.5px;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:100;max-width:190px;text-align:center;pointer-events:none}
 
+/* ══════════════════ CURSO SCREEN — 21 DÍAS ══════════════════ */
+#course-screen{overflow-y:auto;padding:0 0 32px;background:
+  radial-gradient(ellipse 90% 40% at 50% 0%, rgba(183,142,255,0.14) 0%, transparent 60%),
+  linear-gradient(180deg, #14121f 0%, #0f0e17 40%)}
+#course-screen::-webkit-scrollbar{width:0}
+.course-hero{margin:20px 18px 18px;background:linear-gradient(155deg, rgba(34,31,53,0.92), rgba(26,24,38,0.88));border:1px solid rgba(183,142,255,0.16);border-radius:26px;padding:24px 20px;text-align:center;box-shadow:0 14px 34px -14px rgba(0,0,0,0.55)}
+.course-hero-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:500}
+.course-hero-sub{font-size:11.5px;color:var(--text-muted);margin-top:4px;line-height:1.5}
+.course-hero-day{font-family:'Playfair Display',serif;font-size:30px;margin-top:16px;color:#B78EFF}
+.course-hero-daylabel{font-size:10.5px;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+.course-progress-wrap{width:100%;background:rgba(255,255,255,0.06);border-radius:8px;height:7px;overflow:hidden;margin-top:16px}
+.course-progress-bar{height:100%;background:linear-gradient(90deg,#B78EFF,#E5C07B);border-radius:8px;transition:width .4s ease}
+.course-hero-btn{width:100%;margin-top:18px;padding:14px;border-radius:15px;background:linear-gradient(135deg,#B78EFF,#8f6fd6 55%,#E5C07B);border:none;color:#100e19;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 10px 24px -8px rgba(183,142,255,0.5)}
+.course-week-label{padding:4px 20px 10px;font-size:11px;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-top:8px}
+.course-list{padding:0 18px}
+.course-day-item{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:18px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.015);margin-bottom:8px;cursor:pointer;transition:all .2s ease}
+.course-day-item:hover{border-color:rgba(183,142,255,0.3);background:rgba(255,255,255,0.03)}
+.course-day-item.locked{opacity:.4;cursor:default}
+.course-day-item.locked:hover{border-color:rgba(255,255,255,0.06);background:rgba(255,255,255,0.015)}
+.course-day-num{width:34px;height:34px;border-radius:50%;background:rgba(183,142,255,0.1);border:1.5px solid rgba(183,142,255,0.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#B78EFF;flex-shrink:0}
+.course-day-item.done .course-day-num{background:linear-gradient(135deg,#B78EFF,#E5C07B);border-color:transparent;color:#100e19}
+.course-day-item.today .course-day-num{box-shadow:0 0 0 4px rgba(183,142,255,0.18)}
+.course-day-text{flex:1;min-width:0}
+.course-day-title{font-size:13px;font-weight:500}
+.course-day-focus{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+.course-day-check{font-size:15px;flex-shrink:0}
+.course-modal-body{font-size:13px;color:var(--text-muted);line-height:1.75;text-align:left}
+.course-modal-focus{font-size:11px;color:#B78EFF;letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px;text-align:left}
+
 /* ══════════════════ PROFILE SCREEN — SANCTUARY REDESIGN ══════════════════ */
 #settings-screen{overflow-y:auto;padding:0 0 32px;gap:0;background:
   radial-gradient(ellipse 90% 40% at 50% 0%, rgba(183,142,255,0.16) 0%, transparent 60%),
@@ -316,6 +345,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div id="tabs">
 <button class="tab-btn active" onclick="switchTab('chat')" id="tab-chat">🌙 Chat</button>
 <button class="tab-btn" onclick="switchTab('mood')" id="tab-mood">🌈 Estado</button>
+<button class="tab-btn" onclick="switchTab('course')" id="tab-course">📚 Curso</button>
 <button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">⚙️ Perfil</button>
 </div>
 
@@ -405,6 +435,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div class="legend-item"><span>😐</span>Regular</div><div class="legend-item"><span>😊</span>Bien</div><div class="legend-item"><span>😄</span>Genial</div>
 </div>
 </div>
+</div>
+
+<!-- CURSO -->
+<div class="screen" id="course-screen">
+<div class="course-hero">
+<div class="course-hero-title">De la ansiedad a la calma</div>
+<div class="course-hero-sub">21 días para recuperar el control</div>
+<div class="course-hero-day" id="course-hero-day">—</div>
+<div class="course-hero-daylabel" id="course-hero-daylabel">Aún no has comenzado</div>
+<div class="course-progress-wrap"><div class="course-progress-bar" id="course-progress-bar" style="width:0%"></div></div>
+<button class="course-hero-btn" id="course-hero-btn" onclick="courseHeroAction()">Comenzar mi camino de 21 días</button>
+</div>
+<div id="course-weeks"></div>
 </div>
 
 <!-- SETTINGS / PROFILE — SANCTUARY REDESIGN -->
@@ -719,17 +762,148 @@ new Notification(msg.title,{body:msg.body,icon:'./icon-192.png',tag:'serena-'+sl
 function testNotification(){
 if(Notification.permission !== 'granted'){
 requestNotifPermission().then(()=>{
-if(Notification.permission==='granted') fireNotification('morning');
+if(Notification.permission==='granted') fireTestNotification();
 });
 return;
 }
-fireNotification('morning');
+fireTestNotification();
 const s = document.getElementById('notif-status');
 s.style.display='block'; setTimeout(()=>{ s.style.display='none'; },2500);
+}
+function fireTestNotification(){
+const arr = NOTIF_MSGS.morning;
+const msg = arr[Math.floor(Math.random()*arr.length)];
+if(Notification.permission==='granted'){
+new Notification(msg.title,{body:msg.body,icon:'./icon-192.png',tag:'serena-test-'+Date.now()});
+}
 }
 
 const DAILY_MESSAGES=["Cada día que decides seguir adelante es una victoria que merece celebrarse.","No tienes que tenerlo todo resuelto. Solo tienes que seguir dando un paso a la vez.","Tus emociones son válidas. Sentir no es debilidad — es ser humano.","El autocuidado no es egoísmo. Es la base desde la que puedes darlo todo.","Eres más resiliente de lo que crees. Ya has superado días difíciles antes.","Hoy no tienes que ser perfecto/a. Solo tienes que ser tú.","La calma no es la ausencia de tormentas — es aprender a respirar dentro de ellas.","Pequeños pasos también son progreso. No te subestimes.","Mereces el mismo amor y paciencia que le das a los demás.","Cada amanecer trae consigo la posibilidad de empezar de nuevo.","Tu historia no ha terminado. El capítulo difícil no es el último.","Está bien pedir ayuda. La fortaleza también se construye con otros.","No todo tiene que estar bien para que tú estés bien.","Confía en el proceso, incluso cuando no puedas ver el resultado.","Hoy, date permiso de simplemente ser.","Tu presencia en este mundo importa más de lo que imaginas.","Las heridas que sanan dejan marcas de sabiduría, no de derrota.","Respira. Este momento también pasará.","Eres suficiente, exactamente como eres hoy.","El descanso también es productivo.","La autocompasión no es rendirse — es tratarte con la bondad que mereces.","Cada vez que te levantas después de caer, te vuelves un poco más tú.","No compares tu proceso con el de nadie más. Tu camino es único.","Tienes más recursos internos de los que reconoces en este momento.","Hoy basta con hacer lo que puedas. Eso es suficiente.","Las emociones difíciles son mensajes, no condenas.","Eres capaz de sostener más de lo que crees.","Celebra lo pequeño. El desayuno, el sol, una respiración profunda.","Tu bienestar es una prioridad, no una opción.","Estás aquí, y eso ya es un comienzo."];
 function getDailyMessage(){return DAILY_MESSAGES[(new Date().getDate()-1)%DAILY_MESSAGES.length];}
+
+/* ══ CURSO: 21 DÍAS ══ */
+const COURSE_DAYS=[
+{d:1,w:1,t:'Tu punto de partida',f:'Bienvenida',b:'Hoy no se trata de resolver nada — solo de llegar. Reconocer que sientes ansiedad ya es un acto de valentía. Durante estos 21 días vas a construir, paso a paso, una relación distinta con tu mente. No busques la calma perfecta; busca estar un poco más presente que ayer.'},
+{d:2,w:1,t:'¿Qué es realmente la ansiedad?',f:'Entender',b:'La ansiedad no es tu enemiga — es un sistema de alarma que a veces se activa de más. Entender esto cambia todo: no estás "roto/a", tu cuerpo simplemente está protegiéndote de amenazas que ya no existen. Hoy, solo observa cuándo aparece, sin juzgarla.'},
+{d:3,w:1,t:'El cuerpo también habla',f:'Señales físicas',b:'Antes de que la mente lo note, el cuerpo ya sabe. Tensión en el pecho, mandíbula apretada, respiración corta — son mensajes, no fallas. Hoy haz un recorrido mental por tu cuerpo, de la cabeza a los pies, y anota dónde vive tu ansiedad físicamente.'},
+{d:4,w:1,t:'Pensamientos no son hechos',f:'Distancia mental',b:'"Voy a fallar" se siente verdadero, pero es solo un pensamiento pasando por tu mente — no una predicción. Practica hoy nombrar tus pensamientos ansiosos como lo que son: "Estoy teniendo el pensamiento de que...". Esa pequeña distancia cambia su poder sobre ti.'},
+{d:5,w:1,t:'El ciclo del miedo al miedo',f:'Romper el patrón',b:'A veces no tememos la situación — tememos sentir ansiedad otra vez. Ese miedo al miedo alimenta el ciclo. Hoy identifica: ¿hay algo que evitas no por el evento en sí, sino por anticipar cómo te vas a sentir?'},
+{d:6,w:1,t:'Tu primer aliado: la respiración',f:'Herramienta base',b:'La respiración es el control remoto de tu sistema nervioso. No es magia — es fisiología. Practica hoy la respiración 4-4-4 que tienes disponible en Serena, aunque sea sin sentir ansiedad, para que tu cuerpo la recuerde cuando la necesites.'},
+{d:7,w:1,t:'Lo que ya sabes de ti',f:'Cierre semana 1',b:'Llevas una semana observándote con más atención. Eso ya es un cambio real, aunque no lo sientas todavía. Hoy, sin presión, escribe o cuéntale a Serena una cosa que hayas notado esta semana sobre cómo se manifiesta tu ansiedad.'},
+{d:8,w:2,t:'Grounding — Volver al presente',f:'Anclarte al ahora',b:'Cuando la ansiedad te lleva al futuro, el grounding te trae de vuelta al cuerpo y al momento presente. Usa hoy el ejercicio 5-4-3-2-1 de Serena la próxima vez que sientas que tu mente se acelera.'},
+{d:9,w:2,t:'Reestructurar pensamientos ansiosos',f:'Cuestionar el pensamiento',b:'No se trata de pensar "positivo" a la fuerza — se trata de preguntarte: ¿es esto 100% cierto? ¿Qué le diría a un amigo que piensa esto? Elige hoy un pensamiento ansioso recurrente y ponlo a prueba con esas preguntas.'},
+{d:10,w:2,t:'La ansiedad anticipatoria',f:'El "qué tal si"',b:'Gran parte de la ansiedad vive en el futuro imaginado, no en el presente real. Hoy, cuando notes un "qué tal si...", pregúntate: ¿esto está pasando ahora mismo? Si no, tu cuerpo puede relajarse un poco — el peligro no es actual.'},
+{d:11,w:2,t:'Límites y sobrecarga',f:'Proteger tu energía',b:'Decir que no también es autocuidado. Mucha ansiedad nace de cargar más de lo que podemos sostener por miedo a decepcionar. Identifica hoy un compromiso que te está costando más de lo que da, y considera qué límite necesitas poner.'},
+{d:12,w:2,t:'Autocompasión en momentos difíciles',f:'Hablarte distinto',b:'¿Le hablarías a un amigo con la dureza con la que te hablas a ti mismo/a? Hoy, cuando cometas un error o sientas ansiedad, practica una frase de autocompasión: "Esto es difícil, y está bien que me cueste."'},
+{d:13,w:2,t:'El poder del descanso real',f:'Recuperar energía',b:'El descanso no es lo que sobra al final del día — es lo que sostiene todo lo demás. Hoy identifica una forma de descanso genuino (no distracción) que puedas darte, aunque sean solo 10 minutos sin pantallas.'},
+{d:14,w:2,t:'Tu caja de herramientas',f:'Cierre semana 2',b:'Ya tienes varias herramientas: respiración, grounding, reestructurar pensamientos, autocompasión. Hoy elige cuál te ha resultado más útil hasta ahora, y practícala una vez más, con intención.'},
+{d:15,w:3,t:'Identifica tus disparadores',f:'Conocer tus patrones',b:'La ansiedad rara vez aparece de la nada — casi siempre hay un patrón. Hoy piensa en las últimas veces que sentiste ansiedad fuerte: ¿qué tenían en común? Nombrar tus disparadores te da poder sobre ellos.'},
+{d:16,w:3,t:'Construye tu plan de calma personal',f:'Tu propio manual',b:'Con todo lo que has practicado, hoy es el día de crear tu plan personal: 3 herramientas que sabes que te funcionan, y en qué momento usar cada una. Guárdalo donde puedas verlo en un mal día.'},
+{d:17,w:3,t:'Relaciones y ansiedad social',f:'Conectar sin miedo',b:'La ansiedad social suele venir del miedo al juicio ajeno. Hoy recuerda: la mayoría de las personas están mucho más ocupadas pensando en sí mismas que juzgándote a ti. Practica una pequeña interacción social con esa idea en mente.'},
+{d:18,w:3,t:'Cuándo pedir ayuda profesional',f:'No estás solo/a',b:'Serena es un espacio de apoyo, no un reemplazo de terapia. Si la ansiedad interfiere fuertemente con tu vida diaria, hablar con un profesional de salud mental es un acto de fortaleza, no de debilidad. Hoy reflexiona honestamente sobre si ese paso podría ayudarte.'},
+{d:19,w:3,t:'Prevenir recaídas',f:'Sostener el cambio',b:'Vas a tener días difíciles después de este curso — eso es normal, no un fracaso. Hoy piensa: ¿cómo vas a reconocer cuándo estás retrocediendo, y qué vas a hacer en ese momento? Tener un plan de antemano te protege.'},
+{d:20,w:3,t:'Celebra tu progreso',f:'Reconocer el camino',b:'Han pasado 20 días desde que empezaste. Aunque no te sientas "curado/a" —porque esto no es una meta final sino un proceso continuo— sí has cambiado tu relación con la ansiedad. Hoy, nombra una cosa que hoy manejas distinto a como la manejabas el día 1.'},
+{d:21,w:3,t:'Tu nuevo comienzo',f:'Integración final',b:'Este no es el final, es el comienzo de una forma distinta de habitar tu mente. Sigues teniendo a Serena contigo cada día. Hoy, agradécete por haber llegado hasta aquí — eso ya dice mucho de tu fortaleza.'}
+];
+
+let courseState = JSON.parse(localStorage.getItem('serena_course')||'{"started":false,"startDate":null,"completed":[]}');
+
+function getCourseCurrentDay(){
+if(!courseState.started) return 0;
+const start=new Date(courseState.startDate+'T00:00:00');
+const now=new Date();
+const diffDays=Math.floor((now-start)/(1000*60*60*24));
+return Math.min(21, diffDays+1);
+}
+
+function startCourse(){
+courseState={started:true,startDate:todayKey(),completed:[]};
+localStorage.setItem('serena_course',JSON.stringify(courseState));
+renderCourseScreen();
+}
+
+function courseHeroAction(){
+if(!courseState.started){ startCourse(); return; }
+const day=getCourseCurrentDay();
+openCourseDay(Math.min(day,21));
+}
+
+function markDayComplete(day){
+if(!courseState.completed.includes(day)) courseState.completed.push(day);
+localStorage.setItem('serena_course',JSON.stringify(courseState));
+closeExercise();
+renderCourseScreen();
+}
+
+function openCourseDay(day){
+const info=COURSE_DAYS.find(x=>x.d===day);
+if(!info) return;
+const isDone=courseState.completed.includes(day);
+setModal({
+icon:'📖',
+title:info.t,
+stepLabel:`Día ${day} de 21`,
+body:`<div class="course-modal-focus">${info.f}</div><p class="course-modal-body">${info.b}</p>`,
+actions:`<button class="modal-btn" onclick="markDayComplete(${day})">${isDone?'✓ Ya completado — marcar de nuevo':'Marcar como completado'}</button><button class="modal-btn-ghost" style="margin-top:8px" onclick="closeExercise();switchTab('chat');startChat('Quiero hablar sobre el día ${day} del curso: ${info.t}')">Hablar con Serena sobre esto</button>`
+});
+document.getElementById('exercise-modal').classList.add('open');
+}
+
+function renderCourseScreen(){
+const currentDay=getCourseCurrentDay();
+const heroDay=document.getElementById('course-hero-day');
+const heroLabel=document.getElementById('course-hero-daylabel');
+const heroBtn=document.getElementById('course-hero-btn');
+const bar=document.getElementById('course-progress-bar');
+
+if(!courseState.started){
+heroDay.textContent='21';
+heroLabel.textContent='días te esperan';
+heroBtn.textContent='Comenzar mi camino de 21 días';
+bar.style.width='0%';
+} else if(currentDay>21){
+heroDay.textContent='✓';
+heroLabel.textContent='¡Curso completado!';
+heroBtn.textContent='Revisar Día 21';
+bar.style.width='100%';
+} else {
+heroDay.textContent=currentDay;
+heroLabel.textContent=`de 21 días`;
+heroBtn.textContent=courseState.completed.includes(currentDay)?'Ver el día de hoy':'Ir al día de hoy';
+bar.style.width=(currentDay/21*100)+'%';
+}
+
+const weeksEl=document.getElementById('course-weeks');
+weeksEl.innerHTML='';
+[1,2,3].forEach(week=>{
+const label=document.createElement('div');
+label.className='course-week-label';
+label.textContent=`Semana ${week}`;
+weeksEl.appendChild(label);
+const list=document.createElement('div');
+list.className='course-list';
+COURSE_DAYS.filter(x=>x.w===week).forEach(info=>{
+const locked=!courseState.started || info.d>currentDay;
+const done=courseState.completed.includes(info.d);
+const isToday=courseState.started && info.d===currentDay && currentDay<=21;
+const item=document.createElement('div');
+item.className='course-day-item'+(locked?' locked':'')+(done?' done':'')+(isToday?' today':'');
+item.innerHTML=`<div class="course-day-num">${done?'✓':info.d}</div><div class="course-day-text"><div class="course-day-title">${info.t}</div><div class="course-day-focus">${info.f}</div></div>${locked?'<span class="course-day-check">🔒</span>':''}`;
+if(!locked) item.onclick=()=>openCourseDay(info.d);
+list.appendChild(item);
+});
+weeksEl.appendChild(list);
+});
+}
+
+function getCourseContextForPrompt(){
+if(!courseState.started) return '';
+const day=Math.min(getCourseCurrentDay(),21);
+const info=COURSE_DAYS.find(x=>x.d===day);
+if(!info) return '';
+return `\n\nCONTEXTO DEL CURSO:\nEl usuario está en el Día ${day} de 21 del curso "De la ansiedad a la calma: 21 días para recuperar el control".\nEnfoque de hoy: "${info.t}" — ${info.f}.\nSi es natural en la conversación, puedes referenciar suavemente este enfoque, sin forzarlo ni sonar como publicidad.`;
+}
+
 
 let exerciseTimer=null,breathPhase=0,breathCycle=0;
 const BREATH_CYCLES=4;
@@ -914,7 +1088,7 @@ function showSuggestions(list){suggestionsEl.innerHTML='';list.forEach(({text,is
 
 async function callClaude(msg){
 history.push({role:'user',content:msg});
-const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM_PROMPT,messages:history})});
+const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM_PROMPT+getCourseContextForPrompt(),messages:history})});
 const data=await res.json();
 let raw=data.content?.[0]?.text||'Lo siento, algo salió mal.';
 const em=raw.match(/EMOTION:(\w+)/);
@@ -946,7 +1120,7 @@ function startChat(text){sendMessage(text);}
 inputEl.addEventListener('input',()=>{inputEl.style.height='auto';inputEl.style.height=Math.min(inputEl.scrollHeight,96)+'px';});
 inputEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 
-function switchTab(tab){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(tab+'-screen').classList.add('active');document.getElementById('tab-'+tab).classList.add('active');if(tab==='mood'){renderCalendar();updateStreak();prefillTodayMood();}if(tab==='settings'){loadNotifSettings();updateStreak();restorePfEmotion();}}
+function switchTab(tab){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(tab+'-screen').classList.add('active');document.getElementById('tab-'+tab).classList.add('active');if(tab==='mood'){renderCalendar();updateStreak();prefillTodayMood();}if(tab==='settings'){loadNotifSettings();updateStreak();restorePfEmotion();}if(tab==='course'){renderCourseScreen();}}
 
 const MOOD_MAP={terrible:{emoji:'😭',color:'#4a6fa5',label:'Muy mal'},bad:{emoji:'😟',color:'#7b6fa5',label:'Mal'},okay:{emoji:'😐',color:'#7e7a94',label:'Regular'},good:{emoji:'😊',color:'#52b788',label:'Bien'},great:{emoji:'😄',color:'#f9c74f',label:'Genial'}};
 let moodData=JSON.parse(localStorage.getItem('serena_moods')||'{}'),selectedMood=null,calYear,calMonth;
