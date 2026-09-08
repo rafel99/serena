@@ -338,6 +338,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .pf-danger-btn{width:100%;margin-top:14px;padding:12px;border-radius:14px;background:none;border:1px solid rgba(193,18,31,0.3);color:rgba(224,120,120,0.85);font-family:'DM Sans',sans-serif;font-size:12.5px;cursor:pointer;transition:all .25s ease}
 .pf-danger-btn:hover{border-color:#c1121f;color:#e07878;background:rgba(193,18,31,0.06)}
 
+/* EXPLORE (self-knowledge tests) */
+.pf-explore-grid{display:flex;flex-direction:column;gap:11px}
+.pf-explore-btn{width:100%;display:flex;align-items:center;gap:13px;text-align:left;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:14px 16px;cursor:pointer;transition:border-color .25s ease,transform .2s ease,background .25s ease}
+.pf-explore-btn:hover{border-color:rgba(183,142,255,0.32);background:rgba(183,142,255,0.05);transform:translateY(-1px)}
+.pf-explore-icon{width:40px;height:40px;border-radius:12px;background:rgba(183,142,255,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pf-explore-text{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.pf-explore-text strong{font-size:13.5px;font-weight:500;color:var(--text)}
+.pf-explore-text span{font-size:11px;color:var(--text-muted)}
+
+/* QUIZ (likert questions inside exercise modal) */
+.quiz-question-text{font-size:14.5px;line-height:1.6;color:var(--text);margin-bottom:15px;text-align:left}
+.quiz-likert{display:flex;flex-direction:column;gap:8px;width:100%}
+.quiz-likert-btn{width:100%;padding:12px 15px;border-radius:13px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;text-align:left;cursor:pointer;transition:all .2s ease}
+.quiz-likert-btn:hover{border-color:#B78EFF;background:rgba(183,142,255,0.08);transform:translateX(2px)}
+.quiz-result-desc{font-size:13.5px;color:var(--text-muted);line-height:1.7;text-align:left}
+.quiz-result-tip{font-size:12px;color:#cdc4e6;line-height:1.6;text-align:left;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.quiz-disclaimer{font-size:10px;color:var(--text-muted);opacity:.7;text-align:center;margin-top:12px;line-height:1.5}
+
 @media (max-width:360px){
   .pf-emotion-circle{width:40px;height:40px;font-size:18px}
   .pf-header-avatar{width:56px;height:56px}
@@ -555,6 +573,25 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <button class="pf-emotion-btn" data-e="anxious" onclick="selectPfEmotion(this,'Ansios@')"><div class="pf-emotion-circle">😰</div><span class="pf-emotion-label">Ansios@</span></button>
 </div>
 <div class="pf-emotion-feedback" id="pf-emotion-feedback"></div>
+</div>
+</div>
+
+<div class="pf-section">
+<div class="pf-card">
+<div class="pf-card-head">
+<div class="pf-card-title">Explora tu historia emocional</div>
+<div class="pf-card-sub">Dos reflexiones breves de autoconocimiento. No es un diagnóstico clínico.</div>
+</div>
+<div class="pf-explore-grid">
+<button class="pf-explore-btn" onclick="openExercise('wounds')">
+<span class="pf-explore-icon">🌱</span>
+<span class="pf-explore-text"><strong>Heridas de la infancia</strong><span>~3 min · patrones emocionales</span></span>
+</button>
+<button class="pf-explore-btn" onclick="openExercise('attachment')">
+<span class="pf-explore-icon">🔗</span>
+<span class="pf-explore-text"><strong>Estilo de apego</strong><span>~3 min · vínculos y relaciones</span></span>
+</button>
+</div>
 </div>
 </div>
 
@@ -1086,9 +1123,78 @@ const BREATH_CYCLES=4;
 const GROUNDING_STEPS=[{n:5,sense:'VER',prompt:'Nombra 5 cosas que puedes ver ahora mismo.'},{n:4,sense:'TOCAR',prompt:'Nombra 4 cosas que puedes tocar.'},{n:3,sense:'OÍR',prompt:'Nombra 3 sonidos que escuchas.'},{n:2,sense:'OLER',prompt:'Nombra 2 cosas que puedes oler.'},{n:1,sense:'SABOREAR',prompt:'Nombra 1 sabor que percibes en este momento.'}];
 const PMR_STEPS=[{muscle:'Manos y brazos',emoji:'🤲',action:'Aprieta ambos puños con fuerza durante 7 segundos…',release:'Suelta y siente cómo la tensión se disuelve.'},{muscle:'Hombros',emoji:'🫱',action:'Sube los hombros hasta las orejas durante 7 segundos…',release:'Déjalos caer. Siente el alivio.'},{muscle:'Cara',emoji:'😬',action:'Arruga toda la cara 7 segundos…',release:'Relaja completamente. Respira.'},{muscle:'Abdomen',emoji:'🫀',action:'Contrae el abdomen con fuerza 7 segundos…',release:'Suelta y observa la diferencia.'},{muscle:'Piernas y pies',emoji:'🦵',action:'Estira las piernas y apunta los pies hacia arriba, 7 segundos…',release:'Suelta. Siente el cuerpo relajado.'}];
 const AFFIRMATIONS=["Soy capaz de superar los desafíos que se presentan en mi vida.","Merezco amor, paz y bienestar.","Mis emociones son válidas y las acepto con compasión.","Tengo la fortaleza para enfrentar este momento.","Estoy aprendiendo y creciendo cada día.","Me permito descansar sin culpa.","Soy suficiente exactamente como soy.","Elijo soltar lo que no puedo controlar.","Mi bienestar es una prioridad.","Confío en mi proceso y en mi camino."];
+
+/* ══ EXPLORE TESTS (heridas de infancia / apego) — autoconocimiento, no diagnóstico ══ */
+const WOUND_QUESTIONS=[
+{text:'Siento que debo esconder partes de mí para que me acepten.',cat:'rechazo'},
+{text:'Me cuesta creer que las personas me quieran tal como soy.',cat:'rechazo'},
+{text:'Temo que las personas importantes para mí se alejen.',cat:'abandono'},
+{text:'Me cuesta estar en soledad sin sentir ansiedad.',cat:'abandono'},
+{text:'Me cuesta decir que no, aunque no tenga ganas de hacer algo.',cat:'humillacion'},
+{text:'Siento vergüenza con facilidad, incluso por cosas pequeñas.',cat:'humillacion'},
+{text:'Me cuesta confiar plenamente en las personas, incluso sin motivo para dudar.',cat:'traicion'},
+{text:'Necesito sentir que tengo el control de una situación para estar tranquil@.',cat:'traicion'},
+{text:'Soy muy exigente conmigo mism@ y con los demás.',cat:'injusticia'},
+{text:'Me cuesta mostrar mis emociones o pedir ayuda.',cat:'injusticia'}
+];
+const WOUND_INFO={
+rechazo:{label:'Rechazo',icon:'🌙',desc:'Puede que hayas aprendido a protegerte evitando mostrarte por completo, por miedo a no ser suficiente para alguien. Es un patrón común, no una falla — y se transforma reconociendo que tu valor no depende de la aprobación externa.',tip:'Practica una afirmación que te recuerde que mereces ocupar espacio tal como eres.'},
+abandono:{label:'Abandono',icon:'🍃',desc:'Es posible que sientas una alerta constante ante la posibilidad de perder a las personas cercanas, lo que puede generar ansiedad o necesidad de reafirmación. Reconocerlo es el primer paso para sentirte más segur@ incluso en la incertidumbre.',tip:'Un ejercicio de respiración puede ayudarte a volver al presente cuando aparezca esa ansiedad.'},
+humillacion:{label:'Humillación',icon:'🌸',desc:'Quizás te cuesta poner límites o mostrar tus propias necesidades, por temor a sentirte expuesto/a o juzgado/a. Aprender a decir "esto también importa" es un acto de cuidado propio, no de egoísmo.',tip:'Practica una frase de límites sencilla la próxima vez que sientas que dices "sí" sin querer.'},
+traicion:{label:'Traición',icon:'🔮',desc:'Puede que necesites certeza y control para sentirte a salvo, lo cual tiene sentido si en el pasado la confianza se vio quebrada. Ir soltando el control de a poco, en espacios seguros, puede ayudarte a confiar de nuevo.',tip:'Nombra a una persona en la que sí confías, y recuerda por qué se siente segura.'},
+injusticia:{label:'Injusticia',icon:'⭐',desc:'Es probable que te exijas mucho y te cueste mostrar vulnerabilidad, como si las emociones "debilitaran" tu criterio. Permitirte imperfección es, en realidad, un signo de fortaleza.',tip:'Hoy, permítete hacer algo "suficientemente bien" en vez de perfecto.'}
+};
+const ATTACHMENT_QUESTIONS=[
+{text:'Me siento cómod@ compartiendo mis emociones con las personas cercanas.',cat:'seguro'},
+{text:'Confío en que mis relaciones importantes pueden durar, incluso con desacuerdos.',cat:'seguro'},
+{text:'Necesito señales frecuentes de que le importo a la otra persona.',cat:'ansioso'},
+{text:'Me preocupa bastante que dejen de quererme.',cat:'ansioso'},
+{text:'Pienso mucho en mis relaciones cuando no estoy con la otra persona.',cat:'ansioso'},
+{text:'Prefiero resolver las cosas por mí mism@ antes que depender de alguien.',cat:'evitativo'},
+{text:'Me incomoda la cercanía emocional excesiva.',cat:'evitativo'},
+{text:'Me cuesta expresar lo que siento, incluso con quienes quiero.',cat:'evitativo'},
+{text:'Quiero estar cerca de las personas, pero al mismo tiempo me da miedo.',cat:'desorganizado'},
+{text:'Mis relaciones cercanas suelen sentirse intensas o inestables.',cat:'desorganizado'}
+];
+const ATTACHMENT_INFO={
+seguro:{label:'Seguro',icon:'🌿',desc:'Tiendes a sentirte cómod@ tanto con la cercanía como con la independencia en tus relaciones. Confías en los demás y en ti mism@, lo cual es una base muy valiosa — y algo que igual se puede seguir cultivando.',tip:'Sigue nutriendo esa confianza compartiendo cómo te sientes con quienes quieres.'},
+ansioso:{label:'Ansioso',icon:'🌊',desc:'Es posible que necesites reafirmación frecuente y te preocupe la disponibilidad emocional de las personas importantes para ti. Esto suele venir de un deseo profundo de conexión, no de un defecto.',tip:'Cuando aparezca la preocupación, prueba nombrarla en voz alta antes de buscar reafirmación externa.'},
+evitativo:{label:'Evitativo',icon:'🗻',desc:'Puede que valores mucho tu independencia y te resulte difícil depender emocionalmente de otras personas. Está bien necesitar espacio — y también vale la pena practicar dejar ver un poco más de ti.',tip:'Intenta compartir un sentimiento pequeño hoy con alguien de confianza, sin resolverlo, solo compartirlo.'},
+desorganizado:{label:'Desorganizado',icon:'🌗',desc:'Quizás sientes el deseo de cercanía y al mismo tiempo temor a ella, lo que puede hacer que tus relaciones se sientan intensas. Con tiempo y apoyo, es posible encontrar más estabilidad en los vínculos.',tip:'Un ejercicio de grounding puede ayudarte a calmar esa sensación de intensidad cuando aparezca.'}
+};
+const LIKERT_OPTIONS=[{v:1,label:'Nunca'},{v:2,label:'Rara vez'},{v:3,label:'A veces'},{v:4,label:'A menudo'},{v:5,label:'Siempre'}];
+let quizState=null;
+function startWoundsTest(){quizState={type:'wounds',index:0,answers:[]};renderQuizQuestion();}
+function startAttachmentTest(){quizState={type:'attachment',index:0,answers:[]};renderQuizQuestion();}
+function getQuizQuestions(){return quizState.type==='wounds'?WOUND_QUESTIONS:ATTACHMENT_QUESTIONS;}
+function getQuizInfo(){return quizState.type==='wounds'?WOUND_INFO:ATTACHMENT_INFO;}
+function getQuizMeta(){return quizState.type==='wounds'?{icon:'🌱',title:'Heridas de la infancia'}:{icon:'🔗',title:'Estilo de apego'};}
+function renderQuizQuestion(){
+const questions=getQuizQuestions();const q=questions[quizState.index];const meta=getQuizMeta();
+const options=LIKERT_OPTIONS.map(o=>`<button class="quiz-likert-btn" onclick="answerQuiz(${o.v})">${o.label}</button>`).join('');
+setModal({icon:meta.icon,title:meta.title,stepLabel:`Pregunta ${quizState.index+1} de ${questions.length}`,body:`<div class="quiz-question-text">${q.text}</div><div class="quiz-likert">${options}</div>`,showProgress:true,progress:(quizState.index/questions.length)*100,actions:''});
+}
+function answerQuiz(value){
+const questions=getQuizQuestions();
+quizState.answers.push({cat:questions[quizState.index].cat,value});
+quizState.index++;
+if(quizState.index>=questions.length){showQuizResults();}else{renderQuizQuestion();}
+}
+function showQuizResults(){
+const info=getQuizInfo();
+const totals={},counts={};
+quizState.answers.forEach(a=>{totals[a.cat]=(totals[a.cat]||0)+a.value;counts[a.cat]=(counts[a.cat]||0)+1;});
+let bestCat=null,bestAvg=-1;
+Object.keys(totals).forEach(cat=>{const avg=totals[cat]/counts[cat];if(avg>bestAvg){bestAvg=avg;bestCat=cat;}});
+const result=info[bestCat];
+const savedType=quizState.type;
+localStorage.setItem('serena_'+savedType+'_result',JSON.stringify({key:bestCat,date:todayKey()}));
+setModal({icon:result.icon,title:result.label,stepLabel:'Tu patrón predominante',body:`<p class="quiz-result-desc">${result.desc}</p><p class="quiz-result-tip">💡 ${result.tip}</p><p class="quiz-disclaimer">Esto es una reflexión de autoconocimiento, no un diagnóstico clínico. Si sientes que necesitas apoyo profesional, buscarlo es un acto de cuidado propio.</p>`,actions:`<button class="modal-btn" onclick="closeExercise();openExercise('breath')">Hacer una respiración guiada</button><button class="modal-btn-ghost" style="margin-top:8px" onclick="closeExercise()">Cerrar</button>`});
+quizState=null;
+}
 let groundingIndex=0,groundingDone=[],pmrIndex=0,pmrPhase='tense',affirmIdx=0;
 
-function openExercise(t){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.add('open');if(t==='breath')startBreathing();else if(t==='ground')startGrounding();else if(t==='affirm')startAffirmations();else if(t==='pmr')startPMR();else if(t==='motivation')showMotivation();}
+function openExercise(t){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.add('open');if(t==='breath')startBreathing();else if(t==='ground')startGrounding();else if(t==='affirm')startAffirmations();else if(t==='pmr')startPMR();else if(t==='motivation')showMotivation();else if(t==='wounds')startWoundsTest();else if(t==='attachment')startAttachmentTest();}
 function closeExercise(){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.remove('open');const bc=document.getElementById('breath-circle');if(bc){bc.className='';bc.style.transform='scale(1)';}}
 function setModal({icon,title,stepLabel='',body='',actions='',showProgress=false,progress=0}){document.getElementById('modal-icon').textContent=icon;document.getElementById('modal-title').textContent=title;document.getElementById('modal-step-label').textContent=stepLabel;document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-actions').innerHTML=actions;const pw=document.getElementById('modal-progress-wrap');pw.style.display=showProgress?'block':'none';if(showProgress)document.getElementById('modal-progress-bar').style.width=progress+'%';}
 function startBreathing(){breathPhase=0;breathCycle=0;setModal({icon:'🌬️',title:'Respiración 4-4-4',body:`<div id="breath-circle">Prepárate</div><p style="font-size:12px;color:var(--text-muted);margin-top:8px">${BREATH_CYCLES} ciclos completos</p>`,showProgress:true,progress:0,actions:`<button class="modal-btn-ghost" onclick="closeExercise()">Terminar</button>`});setTimeout(runBreath,1500);}
