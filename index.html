@@ -1289,10 +1289,10 @@ document.getElementById('speaking-indicator').classList.remove('show');
 return;
 }
 const utter = new SpeechSynthesisUtterance(chunks[idx++]);
-utter.lang = 'es-ES';
-utter.rate = 0.9;
-utter.pitch = 1.05;
 const voice = getBestVoice();
+utter.lang = voice ? voice.lang : 'es-ES';
+utter.rate = 0.94;
+utter.pitch = 1.0;
 if (voice) utter.voice = voice;
 utter.onend = speakNext;
 utter.onerror = () => {
@@ -1460,16 +1460,31 @@ voiceReady = true;
 document.addEventListener('click', unlockAudio, { once: true });
 document.addEventListener('touchstart', unlockAudio, { once: true });
 
+let _cachedVoice = null;
+function scoreVoice(v) {
+const n = v.name.toLowerCase(), l = v.lang.replace('_','-');
+if (!l.toLowerCase().startsWith('es')) return -1;
+let s = 0;
+// Voces neurales/naturales (Edge, Chrome, Apple premium) suenan mucho mejor
+if (/natural|neural|online/.test(n)) s += 100;
+if (/premium|enhanced|mejorada|siri/.test(n)) s += 80;
+if (/google/.test(n)) s += 50;
+// Voces femeninas conocidas, cálidas
+if (/dalia|elvira|elena|paloma|salome|salomé|helena|lucia|lucía|paulina|mónica|monica|marisol|catalina|sabina|female|mujer|google español/.test(n)) s += 30;
+// Evitar voces masculinas / compactas / robóticas
+if (/jorge|pablo|raul|raúl|diego|alvaro|álvaro|male |hombre|compact|espeak/.test(n)) s -= 60;
+// Preferencia de acento: Latinoamérica primero
+if (/^es-(mx|us|419|co|ar|cl|pe|ve)/i.test(l)) s += 15; else if (/^es-es/i.test(l)) s += 8;
+if (v.localService) s += 2;
+return s;
+}
 function getBestVoice() {
+if (_cachedVoice) return _cachedVoice;
 const voices = window.speechSynthesis.getVoices();
-const tests = [
-v => v.lang === 'es-MX' && /paulina|female/i.test(v.name),
-v => v.lang === 'es-ES' && /mónica|helena|lucia|female/i.test(v.name),
-v => v.lang.startsWith('es') && v.localService,
-v => v.lang.startsWith('es'),
-];
-for (const fn of tests) { const f = voices.find(fn); if (f) return f; }
-return null;
+let best = null, bestScore = -1;
+for (const v of voices) { const s = scoreVoice(v); if (s > bestScore) { best = v; bestScore = s; } }
+if (best && voices.length) _cachedVoice = best;
+return best;
 }
 
 function splitIntoChunks(text, maxLen) {
@@ -1489,11 +1504,11 @@ document.getElementById('speaking-indicator').classList.remove('show');
 return;
 }
 const utter = new SpeechSynthesisUtterance(chunks[idx]);
-utter.lang = 'es-ES';
-utter.rate = 0.87;
-utter.pitch = 1.1;
-utter.volume = 1;
 const voice = getBestVoice();
+utter.lang = voice ? voice.lang : 'es-ES';
+utter.rate = 0.94;
+utter.pitch = 1.0;
+utter.volume = 1;
 if (voice) utter.voice = voice;
 if (idx === 0) document.getElementById('speaking-indicator').classList.add('show');
 utter.onend = () => speakChunks(chunks, idx + 1);
@@ -1517,7 +1532,7 @@ speakChunks(splitIntoChunks(clean, 180), 0);
 if ('speechSynthesis' in window) {
 window.speechSynthesis.getVoices();
 if (typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
-window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+window.speechSynthesis.onvoiceschanged = () => { _cachedVoice = null; window.speechSynthesis.getVoices(); };
 }
 }
 
