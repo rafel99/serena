@@ -94,7 +94,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .exercise-card-desc{font-size:11.5px;color:var(--text-muted);line-height:1.6;margin-bottom:10px}
 .exercise-start-btn{width:100%;padding:8px;border-radius:10px;background:linear-gradient(135deg,var(--orb-a),var(--orb-b));border:none;color:white;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:opacity 0.2s}
 
-#exercise-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(10,9,18,0.92);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;padding:22px}
+#exercise-modal{display:none;position:fixed;inset:0;z-index:600;overflow-y:auto;background:rgba(10,9,18,0.92);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;padding:22px}
 #exercise-modal.open{display:flex}
 .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:24px 18px;width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;position:relative}
 .modal-close{position:absolute;top:13px;right:14px;background:none;border:none;color:var(--text-muted);font-size:19px;cursor:pointer}
@@ -354,6 +354,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .quiz-likert-btn:hover{border-color:#B78EFF;background:rgba(183,142,255,0.08);transform:translateX(2px)}
 .quiz-result-desc{font-size:13.5px;color:var(--text-muted);line-height:1.7;text-align:left}
 .quiz-result-tip{font-size:12px;color:#cdc4e6;line-height:1.6;text-align:left;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+/* HELP / PRIVACY */
+.help-btn{background:rgba(183,142,255,0.12);border:1px solid rgba(183,142,255,0.3);color:#cdb8ff;font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 11px;border-radius:14px;cursor:pointer;margin-right:8px;white-space:nowrap;transition:background .25s ease}
+.help-btn:hover{background:rgba(183,142,255,0.22)}
+.ob-legal{font-size:10.5px;color:var(--text-muted);line-height:1.6;max-width:300px;margin-top:14px;opacity:.85}
+.ob-legal a,.ob-legal button{color:#B78EFF;background:none;border:none;font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+.help-intro{font-size:13px;color:var(--text-muted);line-height:1.7;text-align:left;margin-bottom:12px}
+.help-list{display:flex;flex-direction:column;gap:8px;width:100%}
+.help-line{display:block;text-decoration:none;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:10px 13px;color:var(--text);transition:border-color .2s ease}
+.help-line:hover{border-color:#B78EFF}
+.help-line strong{display:block;font-size:13px;font-weight:500}
+.help-line span{font-size:11.5px;color:var(--text-muted)}
+.help-emergency{font-size:12px;color:#f0c4c4;background:rgba(193,18,31,0.1);border:1px solid rgba(193,18,31,0.3);border-radius:13px;padding:10px 13px;text-align:left;line-height:1.6;margin-bottom:10px}
+.priv-list{text-align:left;font-size:12.5px;color:var(--text-muted);line-height:1.7;padding-left:18px;display:flex;flex-direction:column;gap:7px}
+.risk-card{align-self:flex-start;max-width:290px;background:rgba(193,18,31,0.08);border:1px solid rgba(193,18,31,0.3);border-radius:16px;padding:12px 14px;font-size:12.5px;line-height:1.6;animation:fadeUp 0.3s ease forwards;opacity:0}
+.risk-card button{margin-top:9px;width:100%;padding:9px;border-radius:11px;border:none;background:linear-gradient(135deg,#9b7fd4,#c8a97e);color:white;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer}
 .quiz-disclaimer{font-size:10px;color:var(--text-muted);opacity:.7;text-align:center;margin-top:12px;line-height:1.5}
 
 @media (max-width:360px){
@@ -381,6 +396,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div class="ob-avatar" data-av="🔮" onclick="selectObAvatar(this)">🔮</div>
 </div>
 <button class="ob-btn" onclick="finishOnboarding()">Comenzar ✨</button>
+<p class="ob-legal">Serena es apoyo emocional, no reemplaza terapia profesional. Tus mensajes del chat se procesan con inteligencia artificial para responderte; tu historial se guarda solo en este dispositivo. <button onclick="openExercise('privacy')">Más sobre privacidad</button> · <button onclick="openExercise('help')">Ayuda en crisis</button></p>
 </div>
 
 <div id="offline-pill">📵 Sin conexión</div>
@@ -389,6 +405,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div id="profile-bar">
 <div class="profile-avatar" id="profile-avatar" onclick="switchTab('settings')">🌙</div>
 <div class="profile-name" id="profile-name">Cargando...</div>
+<button class="help-btn" onclick="openExercise('help')" aria-label="Ayuda en crisis">💜 Ayuda</button>
 <div class="profile-streak">🔥 <span id="profile-streak-num">0</span> días</div>
 </div>
 
@@ -655,6 +672,25 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
 <button class="pf-notif-test-btn" onclick="testNotification()">Enviar notificación de prueba</button>
 <div class="pf-notif-status" id="notif-status">✓ Notificación enviada</div>
+</div>
+</div>
+
+<div class="pf-section">
+<div class="pf-card">
+<div class="pf-card-head">
+<div class="pf-card-title">Ayuda y privacidad</div>
+<div class="pf-card-sub">Si lo necesitas, no estás solo/a</div>
+</div>
+<div class="pf-explore-grid">
+<button class="pf-explore-btn" onclick="openExercise('help')">
+<span class="pf-explore-icon">💜</span>
+<span class="pf-explore-text"><strong>Ayuda en crisis</strong><span>Líneas de apoyo y qué hacer ahora</span></span>
+</button>
+<button class="pf-explore-btn" onclick="openExercise('privacy')">
+<span class="pf-explore-icon">🔒</span>
+<span class="pf-explore-text"><strong>Privacidad</strong><span>Qué se guarda y qué se procesa</span></span>
+</button>
+</div>
 </div>
 </div>
 
@@ -1196,7 +1232,35 @@ quizState=null;
 }
 let groundingIndex=0,groundingDone=[],pmrIndex=0,pmrPhase='tense',affirmIdx=0;
 
-function openExercise(t){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.add('open');if(t==='breath')startBreathing();else if(t==='ground')startGrounding();else if(t==='affirm')startAffirmations();else if(t==='pmr')startPMR();else if(t==='motivation')showMotivation();else if(t==='wounds')startWoundsTest();else if(t==='attachment')startAttachmentTest();}
+function openExercise(t){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.add('open');if(t==='breath')startBreathing();else if(t==='ground')startGrounding();else if(t==='affirm')startAffirmations();else if(t==='pmr')startPMR();else if(t==='motivation')showMotivation();else if(t==='wounds')startWoundsTest();else if(t==='attachment')startAttachmentTest();else if(t==='help')showHelp();else if(t==='privacy')showPrivacy();}
+
+/* ══ AYUDA EN CRISIS / PRIVACIDAD ══ */
+function showHelp(){
+setModal({icon:'💜',title:'No estás solo/a',stepLabel:'Ayuda en crisis',body:`<p class="help-intro">Si estás pensando en hacerte daño o sientes que no puedes más, hablar con una persona real puede ayudarte ahora. Estas líneas son gratuitas y confidenciales.</p>
+<div class="help-emergency"><strong>Si estás en peligro inmediato</strong>, llama al número de emergencias de tu país (911, 112 u otro) o ve a urgencias.</div>
+<div class="help-list">
+<a class="help-line" href="tel:988"><strong>Estados Unidos: 988</strong><span>Llama y marca 2 para español. También por texto: AYUDA al 988.</span></a>
+<a class="help-line" href="tel:024"><strong>España: 024</strong><span>Atención a la conducta suicida, las 24 horas.</span></a>
+<a class="help-line" href="tel:8009112000"><strong>México: 800 911 2000</strong><span>Línea de la Vida.</span></a>
+<a class="help-line" href="https://findahelpline.com/es" target="_blank" rel="noopener"><strong>Otros países</strong><span>Directorio internacional de líneas de ayuda (findahelpline.com).</span></a>
+</div>
+<p class="quiz-disclaimer">Los números pueden cambiar; si alguno no responde, busca la línea de tu país en el directorio. Serena es apoyo emocional y no es un servicio de emergencia.</p>`,actions:`<button class="modal-btn-ghost" onclick="closeExercise()">Cerrar</button>`});
+}
+function showPrivacy(){
+setModal({icon:'🔒',title:'Tu privacidad',stepLabel:'Qué se guarda y qué se procesa',body:`<ul class="priv-list">
+<li><strong>En tu dispositivo:</strong> tu nombre, avatar, estados de ánimo, resultados de los tests y recordatorios se guardan solo en este dispositivo. Puedes borrarlos en Perfil → “Borrar todos mis datos”.</li>
+<li><strong>Chat con IA:</strong> lo que escribes a Serena se envía a un servicio de inteligencia artificial para generar la respuesta. Evita compartir datos sensibles como documentos, contraseñas o direcciones.</li>
+<li><strong>Voz:</strong> si usas “Escuchar”, el texto de la respuesta puede enviarse a un servicio de voz, o se lee con la voz de tu navegador.</li>
+<li><strong>Estadísticas:</strong> usamos un contador de visitas anónimo (sin leer tus mensajes).</li>
+<li><strong>Importante:</strong> Serena no reemplaza terapia ni atención médica.</li>
+</ul>`,actions:`<button class="modal-btn" onclick="closeExercise()">Entendido</button>`});
+}
+const RISK_RE=/(suicid|quitarme la vida|quitarme la existencia|acabar con mi vida|acabar con todo|matarme|me quiero morir|quiero morir|no quiero vivir|no quiero seguir viviendo|hacerme da[ñn]o|lastimarme|cortarme las venas|mejor muerto|mejor muerta|desaparecer para siempre)/i;
+function showRiskCard(){
+const el=document.createElement('div');el.className='risk-card';
+el.innerHTML=`<strong>Tu seguridad importa.</strong><br>Si estás pensando en hacerte daño, hablar con alguien ahora puede ayudar. Hay personas disponibles las 24 horas.<button onclick="openExercise('help')">Ver líneas de ayuda</button>`;
+messagesEl.appendChild(el);messagesEl.scrollTop=messagesEl.scrollHeight;
+}
 function closeExercise(){clearInterval(exerciseTimer);document.getElementById('exercise-modal').classList.remove('open');const bc=document.getElementById('breath-circle');if(bc){bc.className='';bc.style.transform='scale(1)';}}
 function setModal({icon,title,stepLabel='',body='',actions='',showProgress=false,progress=0}){document.getElementById('modal-icon').textContent=icon;document.getElementById('modal-title').textContent=title;document.getElementById('modal-step-label').textContent=stepLabel;document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-actions').innerHTML=actions;const pw=document.getElementById('modal-progress-wrap');pw.style.display=showProgress?'block':'none';if(showProgress)document.getElementById('modal-progress-bar').style.width=progress+'%';}
 function startBreathing(){breathPhase=0;breathCycle=0;setModal({icon:'🌬️',title:'Respiración 4-4-4',body:`<div id="breath-circle">Prepárate</div><p style="font-size:12px;color:var(--text-muted);margin-top:8px">${BREATH_CYCLES} ciclos completos</p>`,showProgress:true,progress:0,actions:`<button class="modal-btn-ghost" onclick="closeExercise()">Terminar</button>`});setTimeout(runBreath,1500);}
@@ -1401,6 +1465,7 @@ addMessage(text,'user');showTyping();setThinking();
 try{
 const{reply,emotionKey,exercises}=await callClaude(text);
 removeTyping();setEmotion(emotionKey);addMessage(reply,'bot');
+if(RISK_RE.test(text))showRiskCard();
 if(exercises.length>0)insertExerciseCards(exercises);
 showSuggestions(history.length<=4
 ?[{text:'Cuéntame más',isEx:false},{text:'Necesito calmarme',isEx:false}]
